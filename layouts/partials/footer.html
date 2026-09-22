@@ -1,17 +1,17 @@
-<div class="sec" style="padding-top: 56px; padding-bottom: 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap;">
-  <div style="display: flex; flex-direction: column; gap: 14px; max-width: 320px;">
-    <div style="display: flex; align-items: center; gap: 9px;">
+<div class="sec row-between" style="padding-top: 56px; padding-bottom: 48px; border-top: 1px solid var(--border); gap: 40px;">
+  <div class="stack" style="gap: 14px; max-width: 320px;">
+    <div class="row" style="gap: 9px;">
       <svg width="20" height="20" viewBox="0 0 26 26" fill="none" aria-hidden="true"><circle cx="7" cy="6" r="3" stroke="#16181A" stroke-width="1.6"/><circle cx="7" cy="20" r="3" stroke="#16181A" stroke-width="1.6"/><circle cx="19" cy="13" r="3" stroke="#16181A" stroke-width="1.6"/><path d="M7 9 V17" stroke="#16181A" stroke-width="1.6"/><path d="M9.6 7.4 C14 8.5 15.5 10.5 16.3 11.8" stroke="#16181A" stroke-width="1.6" fill="none"/><path d="M9.6 18.6 C14 17.5 15.5 15.5 16.3 14.2" stroke="#16181A" stroke-width="1.6" fill="none"/></svg>
       <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px;">Provenance</span>
     </div>
     <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--muted-2);">Design control that lives in git — and proves it.</p>
   </div>
-  <div style="display: flex; flex-direction: column; gap: 10px;">
-    <span class="mono" style="font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted-2); text-transform: uppercase;">Repository</span>
+  <div class="stack" style="gap: 10px;">
+    <span class="mono eyebrow" style="font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted-2);">Repository</span>
     <a href="https://github.com/dynamatt/provenance" class="mono" style="font-size: 13.5px; color: var(--ink);">dynamatt/provenance</a>
   </div>
-  <div style="display: flex; flex-direction: column; gap: 10px;">
-    <span class="mono" style="font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted-2); text-transform: uppercase;">Site</span>
+  <div class="stack" style="gap: 10px;">
+    <span class="mono eyebrow" style="font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted-2);">Site</span>
     <a href="{{ .Site.Home.RelPermalink }}" style="font-size: 13.5px; color: var(--ink);">Home</a>
     <a href="{{ "architecture/" | relURL }}" style="font-size: 13.5px; color: var(--ink);">Architecture</a>
     <a href="{{ "compare/" | relURL }}" style="font-size: 13.5px; color: var(--ink);">Compare</a>

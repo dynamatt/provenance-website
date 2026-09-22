@@ -77,4 +77,31 @@
 
   h1.hero { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.08; }
   h1.page-h1 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.12; }
+
+  /* Layout primitives */
+  .stack { display: flex; flex-direction: column; }
+  .row { display: flex; align-items: center; }
+  .row-between { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+
+  /* Text components */
+  .eyebrow { font-size: 12.5px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; }
+  .lede { margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); }
+  .body-text { margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted); }
+  .link-muted { color: var(--muted); text-decoration: underline; }
+
+  /* Panels and code display */
+  .panel { border: 1px solid var(--border); border-radius: 6px; background: var(--paper-raised); padding: clamp(28px, 4vw, 48px) clamp(24px, 5vw, 56px); }
+  .code-panel { background: var(--code-bg); border-radius: 6px; padding: 40px 48px; }
+  .code-chip { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--code-text); border: 1px solid var(--code-border); border-radius: 4px; padding: 8px 14px; }
+  .pill { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px; }
+  .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); }
+
+  /* Compare table */
+  .compare-table th { width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted); font-family: inherit; font-weight: 500; }
+  .compare-table th:first-child { width: 18%; padding: 16px 18px; font-size: 11px; }
+  .compare-table th:last-child { color: var(--accent); background: var(--accent-tint); }
+  .compare-table td:first-child { font-weight: 600; color: var(--ink); padding: 15px 18px; }
+  .compare-table td:not(:first-child) { color: var(--muted); }
+  .compare-table td:last-child { background: var(--accent-tint); color: var(--ink); }
+  .compare-table tr:last-child td { border-bottom: none; }
 </style>

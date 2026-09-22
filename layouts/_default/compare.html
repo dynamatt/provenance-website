@@ -1,95 +1,95 @@
 {{ define "main" }}
 
 <!-- HEADER -->
-<div class="sec" style="padding-top: 88px; padding-bottom: 56px; display: flex; flex-direction: column; gap: 20px; max-width: 820px;">
-  <span class="mono" style="font-size: 12.5px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase;">Compared to the status quo</span>
+<div class="sec stack" style="padding-top: 88px; padding-bottom: 56px; gap: 20px; max-width: 820px;">
+  <span class="mono eyebrow">Compared to the status quo</span>
   <h1 class="display page-h1">Traceability tools show you the graph. Provenance enforces it.</h1>
-  <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted);">Greenlight Guru, Jama Connect, Polarion, Codebeamer, and MasterControl all do e-signatures, audit logging, and traceability visibility well — that's established, table-stakes territory, and Provenance implements it too. The gap is what happens between the visibility those tools stop at and the enforcement a regulated team actually needs.</p>
+  <p class="lede">Greenlight Guru, Jama Connect, Polarion, Codebeamer, and MasterControl all do e-signatures, audit logging, and traceability visibility well — that's established, table-stakes territory, and Provenance implements it too. The gap is what happens between the visibility those tools stop at and the enforcement a regulated team actually needs.</p>
 </div>
 
 <!-- TABLE -->
 <div class="sec" style="padding-bottom: 64px;">
   <div class="hscroll" style="border: 1px solid var(--border); border-radius: 6px; background: var(--paper-raised);">
-    <table style="min-width: 1180px;">
+    <table class="compare-table" style="min-width: 1180px;">
       <tr>
-        <th style="width: 18%; padding: 16px 18px; font-size: 11px;">Capability</th>
-        <th style="width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted);">Greenlight Guru</th>
-        <th style="width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted);">Jama Connect</th>
-        <th style="width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted);">Polarion</th>
-        <th style="width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted);">Codebeamer</th>
-        <th style="width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted);">MasterControl</th>
-        <th style="width: 13.6%; padding: 16px 14px; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--accent); background: var(--accent-tint);">Provenance</th>
+        <th>Capability</th>
+        <th>Greenlight Guru</th>
+        <th>Jama Connect</th>
+        <th>Polarion</th>
+        <th>Codebeamer</th>
+        <th>MasterControl</th>
+        <th>Provenance</th>
       </tr>
       <tr>
-        <td style="font-weight: 600; padding: 15px 18px;">Storage format</td>
-        <td style="color: var(--muted);">Proprietary, cloud</td>
-        <td style="color: var(--muted);">Proprietary, cloud</td>
-        <td style="color: var(--muted);">Proprietary DB, not user-operable</td>
-        <td style="color: var(--muted);">Proprietary</td>
-        <td style="color: var(--muted);">Proprietary, cloud</td>
-        <td style="background: var(--accent-tint);">Open — git-native plain text</td>
+        <td>Storage format</td>
+        <td>Proprietary, cloud</td>
+        <td>Proprietary, cloud</td>
+        <td>Proprietary DB, not user-operable</td>
+        <td>Proprietary</td>
+        <td>Proprietary, cloud</td>
+        <td>Open — git-native plain text</td>
       </tr>
       <tr>
-        <td style="font-weight: 600; padding: 15px 18px;">Hosting model</td>
-        <td style="color: var(--muted);">Cloud-hosted only</td>
-        <td style="color: var(--muted);">Cloud-hosted only</td>
-        <td style="color: var(--muted);">Increasingly cloud-only</td>
-        <td style="color: var(--muted);">Not specified publicly</td>
-        <td style="color: var(--muted);">Cloud-based</td>
-        <td style="background: var(--accent-tint);">Self-hosted, local-first</td>
+        <td>Hosting model</td>
+        <td>Cloud-hosted only</td>
+        <td>Cloud-hosted only</td>
+        <td>Increasingly cloud-only</td>
+        <td>Not specified publicly</td>
+        <td>Cloud-based</td>
+        <td>Self-hosted, local-first</td>
       </tr>
       <tr>
-        <td style="font-weight: 600; padding: 15px 18px;">Change enforcement</td>
-        <td style="color: var(--muted);">Not documented</td>
-        <td style="color: var(--muted);">Not documented</td>
-        <td style="color: var(--muted);">Not documented</td>
-        <td style="color: var(--muted);">Visibility only — dependency diagrams</td>
-        <td style="color: var(--muted);">Not documented</td>
-        <td style="background: var(--accent-tint);">Blocking merge gate</td>
+        <td>Change enforcement</td>
+        <td>Not documented</td>
+        <td>Not documented</td>
+        <td>Not documented</td>
+        <td>Visibility only — dependency diagrams</td>
+        <td>Not documented</td>
+        <td>Blocking merge gate</td>
       </tr>
       <tr>
-        <td style="font-weight: 600; padding: 15px 18px;">E-signatures (Part 11)</td>
-        <td style="color: var(--muted);">Compliant, full audit log</td>
-        <td style="color: var(--muted);">Reauth required, tamper-evident</td>
-        <td style="color: var(--muted);">Not detailed publicly</td>
-        <td style="color: var(--muted);">Compliant, user + timestamp</td>
-        <td style="color: var(--muted);">Automated routing, timestamped</td>
-        <td style="background: var(--accent-tint);">Reauth + hash-bound tamper-evidence</td>
+        <td>E-signatures (Part 11)</td>
+        <td>Compliant, full audit log</td>
+        <td>Reauth required, tamper-evident</td>
+        <td>Not detailed publicly</td>
+        <td>Compliant, user + timestamp</td>
+        <td>Automated routing, timestamped</td>
+        <td>Reauth + hash-bound tamper-evidence</td>
       </tr>
       <tr>
-        <td style="font-weight: 600; padding: 15px 18px;">Regulator handoff</td>
-        <td style="color: var(--muted);">Not detailed publicly</td>
-        <td style="color: var(--muted);">Not detailed publicly</td>
-        <td style="color: var(--muted);">Not detailed publicly</td>
-        <td style="color: var(--muted);">Word / Excel export</td>
-        <td style="color: var(--muted);">Not detailed publicly</td>
-        <td style="background: var(--accent-tint);">Offline static site + PDF/Word</td>
+        <td>Regulator handoff</td>
+        <td>Not detailed publicly</td>
+        <td>Not detailed publicly</td>
+        <td>Not detailed publicly</td>
+        <td>Word / Excel export</td>
+        <td>Not detailed publicly</td>
+        <td>Offline static site + PDF/Word</td>
       </tr>
       <tr>
-        <td style="font-weight: 600; padding: 15px 18px; border-bottom: none;">Custom entity types</td>
-        <td style="color: var(--muted); border-bottom: none;">Not user-definable</td>
-        <td style="color: var(--muted); border-bottom: none;">Not user-definable</td>
-        <td style="color: var(--muted); border-bottom: none;">Not user-definable</td>
-        <td style="color: var(--muted); border-bottom: none;">Not user-definable</td>
-        <td style="color: var(--muted); border-bottom: none;">Not user-definable</td>
-        <td style="background: var(--accent-tint); border-bottom: none;">Schema-as-code, no built-ins</td>
+        <td>Custom entity types</td>
+        <td>Not user-definable</td>
+        <td>Not user-definable</td>
+        <td>Not user-definable</td>
+        <td>Not user-definable</td>
+        <td>Not user-definable</td>
+        <td>Schema-as-code, no built-ins</td>
       </tr>
     </table>
   </div>
-  <p style="margin: 14px 0 0; font-size: 13px; color: var(--muted-2); max-width: 900px;">Competitor cells reflect only what each vendor states on its own public marketing and product pages — no hands-on trials. Sources: <a href="https://www.greenlight.guru/design-control-software" style="color: var(--muted); text-decoration: underline;">Greenlight&nbsp;Guru</a>, <a href="https://www.jamasoftware.com/solutions/medtech/" style="color: var(--muted); text-decoration: underline;">Jama&nbsp;Connect</a>, <a href="https://www.siemens.com/en-us/products/polarion/polarion-x/" style="color: var(--muted); text-decoration: underline;">Polarion</a>, <a href="https://3hti.com/alm/end-to-end-traceability-medical-device-development-codebeamer-alm/" style="color: var(--muted); text-decoration: underline;">Codebeamer</a>, <a href="https://www.mastercontrol.com/gxp-lifeline/medical-device-design-history-file-21-cfr-part-820/" style="color: var(--muted); text-decoration: underline;">MasterControl</a>.</p>
+  <p style="margin: 14px 0 0; font-size: 13px; color: var(--muted-2); max-width: 900px;">Competitor cells reflect only what each vendor states on its own public marketing and product pages — no hands-on trials. Sources: <a href="https://www.greenlight.guru/design-control-software" class="link-muted">Greenlight&nbsp;Guru</a>, <a href="https://www.jamasoftware.com/solutions/medtech/" class="link-muted">Jama&nbsp;Connect</a>, <a href="https://www.siemens.com/en-us/products/polarion/polarion-x/" class="link-muted">Polarion</a>, <a href="https://3hti.com/alm/end-to-end-traceability-medical-device-development-codebeamer-alm/" class="link-muted">Codebeamer</a>, <a href="https://www.mastercontrol.com/gxp-lifeline/medical-device-design-history-file-21-cfr-part-820/" class="link-muted">MasterControl</a>.</p>
 </div>
 
 <!-- SYNTHESIS -->
 <div class="sec" style="padding-bottom: 112px;">
-  <div style="border: 1px solid var(--border); border-radius: 6px; padding: clamp(28px, 4vw, 48px) clamp(24px, 5vw, 56px); background: var(--paper-raised); display: flex; flex-direction: column; gap: 18px; max-width: 900px;">
+  <div class="panel stack" style="gap: 18px; max-width: 900px;">
     <h2 class="display" style="font-size: 22px;">Nothing here reinvents e-signatures</h2>
-    <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted);">Signer identity, timestamps, reauthentication, and tamper-evidence are established, expected capabilities, and Provenance's signature design draws directly on how the mature implementations already do it. The real gaps are structural: an open, user-accessible storage format; a hosting model that doesn't default to a vendor's cloud; enforcement that actually blocks a bad change instead of just flagging it; and an offline artifact a reviewer can open without installing anything.</p>
+    <p class="body-text" style="line-height: 1.65;">Signer identity, timestamps, reauthentication, and tamper-evidence are established, expected capabilities, and Provenance's signature design draws directly on how the mature implementations already do it. The real gaps are structural: an open, user-accessible storage format; a hosting model that doesn't default to a vendor's cloud; enforcement that actually blocks a bad change instead of just flagging it; and an offline artifact a reviewer can open without installing anything.</p>
   </div>
 </div>
 
 <!-- CTA -->
 <div class="sec" style="padding-bottom: 96px;">
-  <div style="border: 1px solid var(--border); border-radius: 6px; padding: clamp(28px, 4vw, 48px) clamp(24px, 5vw, 56px); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+  <div class="panel row-between">
     <h2 class="display" style="font-size: 24px;">See where Provenance stands today.</h2>
     <a href="{{ "get-started/" | relURL }}" class="cta-primary" style="padding: 13px 24px; border-radius: 3px; font-size: 15px; font-weight: 600;">Get started →</a>
   </div>
