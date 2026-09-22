@@ -1,0 +1,134 @@
+{{ define "main" }}
+
+<!-- HEADER -->
+<div class="sec" style="padding-top: 88px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 20px; max-width: 820px;">
+  <span class="mono" style="font-size: 12.5px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase;">Architecture</span>
+  <h1 class="display page-h1">One binary. One hash. One source of truth.</h1>
+  <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted);">Provenance is built around a small set of hard architectural commitments — no privileged built-in types, no server in the critical path, and cryptographic identity for everything that matters. Here's how the pieces fit.</p>
+</div>
+
+<!-- 01 SINGLE BINARY -->
+<div class="sec arch-row" style="padding-bottom: 96px; border-top: 1px solid var(--border); padding-top: 64px;">
+  <div class="arch-label" style="display: flex; flex-direction: column; gap: 12px;">
+    <span class="mono" style="font-size: 13px; color: var(--accent);">01</span>
+    <h2 class="display" style="font-size: 26px;">The binary is the unit of trust</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted);">Provenance distributes as one content-addressed binary. It serves the browser UI locally and runs identically in CI — the same executable, the same hash, in both places. The hash is the validation identity: it's what a customer's CSV evidence is written against.</p>
+  </div>
+  <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; min-width: 0;">
+    <div class="hscroll" style="background: var(--code-bg); border-radius: 6px; padding: 44px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 28px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; border: 1px solid var(--code-border); border-radius: 5px; padding: 18px 28px;">
+        <span class="mono" style="font-size: 12px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.06em;">provenance</span>
+        <span class="mono" style="font-size: 13px; color: var(--code-accent);">sha256:9f3a…2c1e</span>
+      </div>
+      <div style="display: flex; gap: 48px; width: max-content;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span class="mono" style="font-size: 12px; color: var(--code-text); border: 1px solid var(--code-border); border-radius: 4px; padding: 8px 14px;">local · browser UI</span>
+          <span class="mono" style="font-size: 11px; color: var(--muted-2);">continuous feedback</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span class="mono" style="font-size: 12px; color: var(--code-text); border: 1px solid var(--code-border); border-radius: 4px; padding: 8px 14px;">CI · same binary</span>
+          <span class="mono" style="font-size: 11px; color: var(--muted-2);">authoritative gate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 ENTITY GRAPH -->
+<div class="sec arch-row" style="padding-bottom: 96px; border-top: 1px solid var(--border); padding-top: 64px;">
+  <div class="arch-label" style="display: flex; flex-direction: column; gap: 12px;">
+    <span class="mono" style="font-size: 13px; color: var(--accent);">02</span>
+    <h2 class="display" style="font-size: 26px;">Schema-as-code, no built-ins</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted);">Every entity type — including Requirements — is a schema file in the repo, not a locked-in built-in. New types are added by a normal commit. Records are plain text with frontmatter; typed links between them form the traceability graph.</p>
+  </div>
+  <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; min-width: 0;">
+    <div style="border: 1px solid var(--border); border-radius: 6px; padding: clamp(20px, 4vw, 40px); width: 100%; display: flex; flex-direction: column; gap: 16px; background: var(--paper-raised);">
+      <span class="mono" style="font-size: 12px; color: var(--muted-2); word-break: break-all;">/entities/requirements/REQ-0142.md</span>
+      <div class="hscroll" style="background: var(--paper); border-radius: 4px; padding: 20px 24px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.85; color: var(--ink);">
+        <div style="white-space: nowrap;"><span style="color: var(--rust);">---</span></div>
+        <div style="white-space: nowrap;"><span style="color: var(--muted);">type:</span> requirement</div>
+        <div style="white-space: nowrap;"><span style="color: var(--muted);">status:</span> approved</div>
+        <div style="white-space: nowrap;"><span style="color: var(--muted);">links:</span></div>
+        <div style="white-space: nowrap; padding-left: 16px;">&#8211; risk: RISK&#8209;0087</div>
+        <div style="white-space: nowrap; padding-left: 16px;">&#8211; verifies: VER&#8209;0304</div>
+        <div style="white-space: nowrap;"><span style="color: var(--rust);">---</span></div>
+        <div style="white-space: nowrap; color: var(--muted);">The device shall limit output current to&#8230;</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 MERGE GATE -->
+<div class="sec arch-row" style="padding-bottom: 96px; border-top: 1px solid var(--border); padding-top: 64px;">
+  <div class="arch-label" style="display: flex; flex-direction: column; gap: 12px;">
+    <span class="mono" style="font-size: 13px; color: var(--accent);">03</span>
+    <h2 class="display" style="font-size: 26px;">The hybrid merge gate</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted);">The browser gives continuous feedback while you work. The CI-executed binary run is the authoritative gate — it talks to your pipeline through process exit codes only, a thin wrapper around the same rule engine.</p>
+  </div>
+  <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; min-width: 0;">
+    <div class="hscroll" style="width: 100%;">
+      <div style="display: flex; align-items: center; gap: 12px; width: max-content;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 5px; padding: 20px 22px; background: var(--paper-raised);">
+          <span class="mono" style="font-size: 12.5px;">git push</span>
+        </div>
+        <span class="mono" style="color: var(--muted-2); font-size: 18px;">→</span>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 5px; padding: 20px 22px; background: var(--paper-raised);">
+          <span class="mono" style="font-size: 12.5px;">CI runs binary</span>
+        </div>
+        <span class="mono" style="color: var(--muted-2); font-size: 18px;">→</span>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 5px; padding: 20px 22px; background: var(--paper-raised);">
+          <span class="mono" style="font-size: 12.5px;">rule check</span>
+        </div>
+        <span class="mono" style="color: var(--muted-2); font-size: 18px;">→</span>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--accent); border-radius: 5px; padding: 10px 16px; background: var(--accent-tint);">
+            <span class="mono" style="font-size: 12px; color: var(--accent);">exit 0 → merge</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--rust); border-radius: 5px; padding: 10px 16px; background: var(--rust-tint);">
+            <span class="mono" style="font-size: 12px; color: var(--rust);">exit 1 → blocked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 HASH CHAINS -->
+<div class="sec arch-row" style="padding-bottom: 96px; border-top: 1px solid var(--border); padding-top: 64px;">
+  <div class="arch-label" style="display: flex; flex-direction: column; gap: 12px;">
+    <span class="mono" style="font-size: 13px; color: var(--accent);">04</span>
+    <h2 class="display" style="font-size: 26px;">Three independent hash chains</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted);">Binary artifact identity, reproducible builds, and DHF content state are verified separately — so a question about the tool never gets confused with a question about the records it produced.</p>
+  </div>
+  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; min-width: 0;">
+    <div style="background: var(--paper-raised); padding: 22px clamp(16px, 3vw, 28px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+      <span class="display" style="font-size: 15px;">Binary artifact identity</span>
+      <span style="font-size: 14px; color: var(--muted); max-width: 440px;">proves the executable being run is the one that was published</span>
+    </div>
+    <div style="background: var(--paper-raised); padding: 22px clamp(16px, 3vw, 28px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+      <span class="display" style="font-size: 15px;">Reproducible build</span>
+      <span style="font-size: 14px; color: var(--muted); max-width: 440px;">proves the published binary was actually built from the published source</span>
+    </div>
+    <div style="background: var(--paper-raised); padding: 22px clamp(16px, 3vw, 28px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+      <span class="display" style="font-size: 15px;">DHF content state</span>
+      <span style="font-size: 14px; color: var(--muted); max-width: 440px;">proves what was actually signed, down to the resolved entity graph</span>
+    </div>
+  </div>
+</div>
+
+<!-- 05 PORTABLE -->
+<div class="sec" style="padding-bottom: 112px; border-top: 1px solid var(--border); padding-top: 64px; display: flex; flex-direction: column; gap: 20px; max-width: 760px;">
+  <span class="mono" style="font-size: 13px; color: var(--accent);">05</span>
+  <h2 class="display" style="font-size: 26px;">Portable by design</h2>
+  <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted);">Because the record store is a standard git repository and the engine is a single binary, Provenance runs the same way on GitHub, GitLab, Bitbucket, or self-hosted git infrastructure. Moving your DHF is a clone, not a migration.</p>
+</div>
+
+<!-- CTA -->
+<div class="sec" style="padding-bottom: 96px;">
+  <div style="border: 1px solid var(--border); border-radius: 6px; padding: clamp(28px, 4vw, 48px) clamp(24px, 5vw, 56px); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+    <h2 class="display" style="font-size: 24px;">See how this compares to the status quo.</h2>
+    <a href="{{ "compare/" | relURL }}" class="cta-primary" style="padding: 13px 24px; border-radius: 3px; font-size: 15px; font-weight: 600;">Compare Provenance →</a>
+  </div>
+</div>
+
+{{ end }}

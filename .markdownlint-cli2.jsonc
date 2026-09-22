@@ -1,0 +1,11 @@
+{
+  "config": {
+    "default": true,
+    // Front matter description values are long single-line strings.
+    "MD013": false,
+    // content/*.md is front matter only by design; body/headings live in
+    // layouts/ instead. See README.md.
+    "MD041": false
+  },
+  "ignores": ["public/**", "resources/**", "node_modules/**"]
+}

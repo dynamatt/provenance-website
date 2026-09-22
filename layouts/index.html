@@ -1,0 +1,127 @@
+{{ define "main" }}
+
+<!-- HERO -->
+<div class="sec" style="padding-top: 96px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 28px; max-width: 900px;">
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; row-gap: 6px;">
+    <span class="mono" style="font-size: 12.5px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase;">GxP design control, git-native</span>
+    <span style="width: 4px; height: 4px; border-radius: 50%; background: var(--border);"></span>
+    <span class="mono" style="font-size: 12.5px; letter-spacing: 0.03em; color: var(--muted-2);">Pre-release — building in the open</span>
+  </div>
+  <h1 class="display hero">Design control that lives in git — and proves it.</h1>
+  <p style="margin: 0; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 680px;">
+    Provenance links requirements, risk, design, and verification into one auditable entity graph — stored as plain, versioned text in a repository you already own. No vendor database. No product-operated server sitting in the critical path.
+  </p>
+  <div style="display: flex; align-items: center; gap: 16px; margin-top: 8px; flex-wrap: wrap;">
+    <a href="https://github.com/dynamatt/provenance" class="cta-primary" style="padding: 13px 24px; border-radius: 3px; font-size: 15px; font-weight: 600; transition: background .15s;">View on GitHub</a>
+    <a href="{{ "architecture/" | relURL }}" style="padding: 13px 4px; font-size: 15px; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--ink);">See how it works →</a>
+  </div>
+</div>
+
+<!-- COMMIT CHAIN VISUAL -->
+<div class="sec" style="padding-bottom: 96px;">
+  <div class="hscroll" style="background: var(--code-bg); border-radius: 6px; padding: 40px 48px;">
+    <div style="display: flex; align-items: center; gap: 8px; width: max-content; min-width: 100%; justify-content: space-between;">
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 170px;">
+        <span class="mono" style="font-size: 11.5px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.06em;">requirement</span>
+        <span class="mono" style="font-size: 13px; color: var(--code-text);">REQ-0142</span>
+        <span class="mono" style="font-size: 12px; color: var(--code-accent);">a1c9e02</span>
+      </div>
+      <span class="mono" style="color: #4A4E48; font-size: 20px;">—▸</span>
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 170px;">
+        <span class="mono" style="font-size: 11.5px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.06em;">risk control</span>
+        <span class="mono" style="font-size: 13px; color: var(--code-text);">RISK-0087</span>
+        <span class="mono" style="font-size: 12px; color: var(--code-accent);">6e4b7f1</span>
+      </div>
+      <span class="mono" style="color: #4A4E48; font-size: 20px;">—▸</span>
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 170px;">
+        <span class="mono" style="font-size: 11.5px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.06em;">design output</span>
+        <span class="mono" style="font-size: 13px; color: var(--code-text);">DES-0231</span>
+        <span class="mono" style="font-size: 12px; color: var(--code-accent);">f02a9d4</span>
+      </div>
+      <span class="mono" style="color: #4A4E48; font-size: 20px;">—▸</span>
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 170px;">
+        <span class="mono" style="font-size: 11.5px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.06em;">verification</span>
+        <span class="mono" style="font-size: 13px; color: var(--code-text);">VER-0304</span>
+        <span class="mono" style="font-size: 12px; color: var(--code-accent);">signed ✓</span>
+      </div>
+    </div>
+  </div>
+  <p class="mono" style="margin: 14px 0 0; font-size: 12.5px; color: var(--muted-2);">Illustrative — every link in the graph is a real, hashed git object.</p>
+</div>
+
+<!-- DIFFERENTIATORS -->
+<div class="sec" style="padding-bottom: 112px;">
+  <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 48px; max-width: 640px;">
+    <span class="mono" style="font-size: 12.5px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase;">Why teams are building on it</span>
+    <h2 class="display" style="font-size: 32px;">What the cloud QMS tools don't do</h2>
+  </div>
+  <div class="grid-2">
+
+    <div class="card" style="background: var(--paper); padding: 36px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s; border: 1px solid transparent;">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="4" y="3" width="18" height="20" rx="1.5" stroke="#16181A" stroke-width="1.5"/><line x1="8" y1="9" x2="18" y2="9" stroke="#16181A" stroke-width="1.5"/><line x1="8" y1="13" x2="18" y2="13" stroke="#16181A" stroke-width="1.5"/><line x1="8" y1="17" x2="14" y2="17" stroke="#16181A" stroke-width="1.5"/></svg>
+      <h3 class="display" style="font-size: 18px;">Open, user-accessible storage</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted);">Your DHF is Markdown and YAML in a git repo — not a row in someone else's database. Any tool, script, or AI agent you already trust can read and operate on it directly.</p>
+    </div>
+
+    <div class="card" style="background: var(--paper); padding: 36px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s; border: 1px solid transparent;">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="9" width="20" height="14" rx="1.5" stroke="#16181A" stroke-width="1.5"/><path d="M8 9V6a5 5 0 0 1 10 0v3" stroke="#16181A" stroke-width="1.5"/><line x1="9" y1="16" x2="10.5" y2="16" stroke="#16181A" stroke-width="1.5"/><line x1="13" y1="16" x2="14.5" y2="16" stroke="#16181A" stroke-width="1.5"/><line x1="17" y1="16" x2="18.5" y2="16" stroke="#16181A" stroke-width="1.5"/></svg>
+      <h3 class="display" style="font-size: 18px;">Local-first by default</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted);">Provenance runs as a single content-addressed binary. Render, check, and sign records on your own machine — nothing has to phone home to run.</p>
+    </div>
+
+    <div class="card" style="background: var(--paper); padding: 36px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s; border: 1px solid transparent;">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M6 5h14v8c0 6-4.5 8.5-7 9.5C10.5 21.5 6 19 6 13V5z" stroke="#16181A" stroke-width="1.5"/><path d="M9.5 13l2.3 2.3L17 10.5" stroke="#16181A" stroke-width="1.5" fill="none"/></svg>
+      <h3 class="display" style="font-size: 18px;">Enforcement, not just visibility</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted);">A merge gate blocks any change that trips a configured rule — severity-scored, exit-code driven, wired straight into the CI you already run. Dependency diagrams don't stop a bad merge; this does.</p>
+    </div>
+
+    <div class="card" style="background: var(--paper); padding: 36px; display: flex; flex-direction: column; gap: 14px; transition: border-color .15s; border: 1px solid transparent;">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="5" width="20" height="14" rx="1.5" stroke="#16181A" stroke-width="1.5"/><line x1="3" y1="9" x2="23" y2="9" stroke="#16181A" stroke-width="1.5"/><circle cx="6.5" cy="7" r="0.9" fill="#16181A"/><line x1="8" y1="22" x2="18" y2="22" stroke="#16181A" stroke-width="1.5"/></svg>
+      <h3 class="display" style="font-size: 18px;">Offline regulator handoff</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted);">Every DHF compiles to a self-contained, zero-dependency static website — plus PDF and Word — that a reviewer opens with no install and no network access.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ARCHITECTURE TEASER -->
+<div class="sec" style="padding-bottom: 112px;">
+  <div style="border: 1px solid var(--border); border-radius: 6px; padding: clamp(28px, 5vw, 56px); display: flex; flex-direction: column; gap: 40px;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+      <h2 class="display" style="font-size: 28px; max-width: 520px;">Author locally. Enforce in CI. Prove it to anyone.</h2>
+      <a href="{{ "architecture/" | relURL }}" style="font-size: 15px; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px;">See the full architecture →</a>
+    </div>
+    <div class="grid-3">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span class="mono" style="font-size: 13px; color: var(--accent);">01</span>
+        <h3 class="display" style="font-size: 16px;">Author</h3>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted);">Requirements, risk, design, and verification records — edited locally, checked continuously in the browser UI.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span class="mono" style="font-size: 13px; color: var(--accent);">02</span>
+        <h3 class="display" style="font-size: 16px;">Enforce</h3>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted);">The same binary runs in CI as the authoritative gate — a rule violation blocks the merge, communicated by exit code alone.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span class="mono" style="font-size: 13px; color: var(--accent);">03</span>
+        <h3 class="display" style="font-size: 16px;">Prove</h3>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted);">Signed, hash-locked records compile to a self-contained DHF site — the artifact a regulator actually reviews.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PORTABILITY STRIP -->
+<div class="sec" style="padding-bottom: 112px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;">
+  <p style="margin: 0; font-size: 16px; color: var(--muted); max-width: 460px;">Built to standards your quality system already answers to — and portable across the git host your organisation already runs.</p>
+  <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+    <span class="mono" style="font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px;">ISO 13485</span>
+    <span class="mono" style="font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px;">21 CFR Part 11</span>
+    <span class="mono" style="font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px;">GitHub</span>
+    <span class="mono" style="font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px;">GitLab</span>
+    <span class="mono" style="font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px;">Bitbucket</span>
+    <span class="mono" style="font-size: 13px; color: var(--ink); border: 1px solid var(--border); padding: 8px 14px; border-radius: 3px;">Self-hosted</span>
+  </div>
+</div>
+
+{{ end }}

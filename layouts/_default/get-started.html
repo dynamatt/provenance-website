@@ -1,0 +1,58 @@
+{{ define "main" }}
+
+<!-- HEADER -->
+<div class="sec" style="padding-top: 88px; padding-bottom: 48px; display: flex; flex-direction: column; gap: 20px; max-width: 780px;">
+  <span class="mono" style="font-size: 12.5px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase;">Get started</span>
+  <h1 class="display page-h1">Provenance is early — here's exactly where it stands.</h1>
+  <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted);">No install yet, and we'd rather tell you that plainly than dress up a placeholder. The architecture and specification are being built in the open — this is where to watch, and where to land when there's a binary to run.</p>
+</div>
+
+<!-- STATUS -->
+<div class="sec" style="padding-bottom: 64px;">
+  <div style="border: 1px solid var(--border); border-radius: 6px; background: var(--paper-raised); padding: clamp(28px, 4vw, 40px) clamp(24px, 5vw, 48px); display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--rust); flex-shrink: 0;"></span>
+      <span class="mono" style="font-size: 13px; color: var(--ink); font-weight: 500;">Pre-release · active specification &amp; design</span>
+    </div>
+    <div class="grid-3">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="mono" style="font-size: 12px; color: var(--accent);">in progress</span>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink);">Core CLI specification — the data model, rule engine, and CI gate contract.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="mono" style="font-size: 12px; color: var(--accent);">in progress</span>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink);">Hash-based verification design — artifact identity, reproducible builds, content state.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="mono" style="font-size: 12px; color: var(--muted-2);">not started</span>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink);">First binary release for local evaluation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REPO -->
+<div class="sec" style="padding-bottom: 96px;">
+  <span class="mono" style="font-size: 12px; letter-spacing: 0.06em; color: var(--muted-2); text-transform: uppercase; display: block; margin-bottom: 20px;">Repository</span>
+  <a href="https://github.com/dynamatt/provenance" class="repocard" style="display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--border); border-radius: 6px; padding: 32px; background: var(--paper-raised); color: var(--ink); transition: border-color .15s; max-width: 620px;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <span class="mono" style="font-size: 14px; font-weight: 500;">dynamatt/provenance</span>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </div>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted);">The CLI engine and local browser UI — the single binary described in the architecture.</p>
+    <span style="font-size: 13.5px; font-weight: 600; color: var(--accent);">View repository →</span>
+  </a>
+</div>
+
+<!-- FOLLOW ALONG -->
+<div class="sec" style="padding-bottom: 112px;">
+  <div style="border-top: 1px solid var(--border); padding-top: 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; gap: 8px; max-width: 560px;">
+      <h2 class="display" style="font-size: 22px;">Follow along</h2>
+      <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted);">Watch the CLI repository for releases — there's no mailing list yet, so the repo is the single source of truth for progress.</p>
+    </div>
+    <a href="https://github.com/dynamatt/provenance" class="cta-primary" style="padding: 13px 24px; border-radius: 3px; font-size: 15px; font-weight: 600;">Watch on GitHub</a>
+  </div>
+</div>
+
+{{ end }}

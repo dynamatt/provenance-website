@@ -1,0 +1,24 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Repository status
+
+This is a Hugo static site (no theme, four hand-built pages) — see `README.md` for local dev, linting, and deploy instructions. There is no JS application, dependency manifest for a frontend framework, or test suite; `package.json` exists only to pin the Markdown linter.
+
+- Build/dev server: `hugo server` (requires the **extended** Hugo binary)
+- Lint: `npm install && npm run lint` (markdownlint on `content/*.md` and `README.md`; CI also runs actionlint on the workflow files via `.github/workflows/lint.yml`)
+- Deploy: `.github/workflows/gh-pages.yml` builds and deploys to GitHub Pages on push to `main`
+
+There are no automated tests. Layout markup lives in `layouts/`, not in Markdown; `content/*.md` files carry only front matter.
+
+## Product context
+
+Provenance is a GxP-compliant, git-native design control platform for medical device teams. It provides cryptographically auditable traceability across requirements, design, risk, and verification, with no product-operated server in the critical path.
+
+Two constraints from that description shape most design decisions and are worth keeping in mind for anything built here:
+
+- **Git-native / no server in the critical path.** Records live in the customer's git repository. Any hosted component is auxiliary — it must not be required for a team to create, read, or verify design control records.
+- **GxP + cryptographic auditability.** Traceability links and their integrity evidence are regulated artifacts (21 CFR Part 11 / ISO 13485 territory). Changes to how records are written, hashed, signed, or linked are audit-relevant, not merely cosmetic.
+
+This repo (`provenance-website`) is the website for that product, not the platform itself.
