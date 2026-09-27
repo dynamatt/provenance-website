@@ -47,9 +47,9 @@ only the fallback for local runs.
 
 ## Known placeholders to revisit
 
-- The "Docs" link in the nav (`layouts/partials/nav.html`) points at
-  `github.com/dynamatt/provenance/tree/main/docs` as a stand-in until
-  there's a real documentation site or section.
+- Most commands in the CLI reference (`content/docs/cli/`) are marked
+  *Not yet implemented*; the marker disappears as each command lands in
+  the `provenance` repo and the reference is regenerated.
 - `content/*.md` front matter and copy throughout assumes the CLI repo
   is `github.com/dynamatt/provenance` — update if that changes.
 - Hugo version pinned in the workflow (`HUGO_VERSION`) is a recent
@@ -68,6 +68,17 @@ only the fallback for local runs.
 Add Markdown pages under `content/docs/`. Use `_index.md` files to create
 sections and regular `.md` files for pages; Hugo Book builds the docs
 navigation from this content tree.
+
+## CLI reference
+
+`content/docs/cli/` is generated from the CLI's own command definitions by
+`tools/gendocs` in the [`provenance`](https://github.com/dynamatt/provenance)
+repo, so it can't drift from `--help`. Don't edit it by hand. With both
+repos checked out side by side, regenerate it from the `provenance` repo:
+
+```sh
+make docs
+```
 
 ## Design tokens
 
