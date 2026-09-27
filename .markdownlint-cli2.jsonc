@@ -7,5 +7,5 @@
     // layouts/ instead. See README.md.
     "MD041": false
   },
-  "ignores": ["public/**", "resources/**", "node_modules/**"]
+  "ignores": ["public/**", "resources/**", "node_modules/**", "themes/hugo-book/**"]
 }

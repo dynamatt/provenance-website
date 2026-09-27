@@ -24,7 +24,7 @@ jobs:
     env:
       # Bump this when you want a newer Hugo. Check the latest release at
       # https://github.com/gohugoio/hugo/releases
-      HUGO_VERSION: 0.139.4
+      HUGO_VERSION: 0.158.0
     steps:
       - name: Install Hugo CLI
         run: |
@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup Pages
         id: pages

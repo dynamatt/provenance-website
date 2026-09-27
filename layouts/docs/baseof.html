@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="{{ default .Site.Language.Name .Site.Language.Locale }}" dir="{{ default "ltr" .Site.Language.Direction }}" data-theme="{{ default "light" .Site.Params.BookTheme }}">
+<head>
+  {{ partial "docs/html-head" . }}
+  {{ partial "docs/inject/head" . }}
+</head>
+<body dir="{{ default "ltr" .Site.Language.Direction }}" class="book-kind-{{ .Kind }} book-type-{{ .Type }}{{ with .Layout }} book-layout-{{ . }}{{ end }}">
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        {{ partial "docs/menu" . }}
+      </div>
+    </aside>
+    <div class="book-page">
+      <header class="book-header hidden">
+        {{ partial "docs/header" . }}
+      </header>
+      {{ partial "docs/inject/content-before" . }}
+      {{ block "main" . }}
+        <article class="markdown book-article">{{ .Content }}</article>
+      {{ end }}
+      {{ partial "docs/inject/content-after" . }}
+      <footer class="book-footer">
+        {{ partial "docs/footer" . }}
+        {{ if and .Content (.Param "BookComments") }}
+          <div class="book-comments">{{ partial "docs/comments" . }}</div>
+        {{ end }}
+        {{ partial "docs/inject/footer" . }}
+        {{ if or .Site.Copyright .Params.Copyright }}
+          <div class="book-copyright flex justify-center">{{ partial "docs/copyright" . }}</div>
+        {{ end }}
+        {{ with resources.Get "clipboard.js" | resources.Minify }}
+          <script>{{ .Content | safeJS }}</script>
+        {{ end }}
+      </footer>
+      <label for="menu-control" class="hidden book-menu-overlay" aria-hidden="true"></label>
+    </div>
+    {{ if .Param "BookToC" | default true }}
+      <aside class="book-toc">
+        <div class="book-toc-content">{{ partial "docs/toc" . }}</div>
+      </aside>
+    {{ end }}
+  </main>
+  {{ partial "docs/inject/body" . }}
+</body>
+</html>
