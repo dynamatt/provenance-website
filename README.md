@@ -1,10 +1,8 @@
 # Provenance Website
 
-The Provenance marketing site — Hugo, no theme, four hand-built pages
-(Home, Architecture, Compare, Get started). Ported from the design canvas;
-layout markup lives in `layouts/`, not in Markdown, since these are
-bespoke pages rather than prose content. `content/*.md` files carry only
-front matter (title, description, which layout/nav item to use).
+The Provenance website — Hugo with hand-built marketing pages and a
+documentation section powered by Hugo Book. Marketing layout markup lives
+in `layouts/`; documentation prose lives in `content/docs/`.
 
 ## Run locally
 
@@ -15,7 +13,15 @@ extended build is what the CI workflow installs, so match it locally):
 hugo server
 ```
 
-Then open <http://localhost:1313/>.
+Initialize the Hugo Book submodule on a fresh clone, then start the site:
+
+```sh
+git submodule update --init --recursive
+hugo server
+```
+
+Then open <http://localhost:1313/>. Documentation is available at
+<http://localhost:1313/docs/>.
 
 ## Lint
 
@@ -49,13 +55,19 @@ only the fallback for local runs.
 - Hugo version pinned in the workflow (`HUGO_VERSION`) is a recent
   release as of when this was scaffolded; bump it periodically.
 
-## Adding a page
+## Adding a marketing page
 
 1. Add `content/<slug>.md` with front matter: `title`, `description`,
    `layout: "<slug>"`, `nav: "<slug>"`.
 2. Add `layouts/_default/<slug>.html` with `{{ define "main" }} ... {{ end }}`.
 3. Add a nav link for it in `layouts/partials/nav.html` (and the footer's
    site-links column, if it should appear there too).
+
+## Adding documentation
+
+Add Markdown pages under `content/docs/`. Use `_index.md` files to create
+sections and regular `.md` files for pages; Hugo Book builds the docs
+navigation from this content tree.
 
 ## Design tokens
 

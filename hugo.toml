@@ -2,6 +2,7 @@ title = "Provenance"
 locale = "en-us"
 
 baseURL = "/"
+theme = "hugo-book"
 
 enableRobotsTXT = true
 summaryLength = 40
@@ -11,6 +12,8 @@ summaryLength = 40
 
 [params]
   description = "Provenance is a GxP-compliant, git-native design control platform that gives medical device teams cryptographically auditable traceability across requirements, design, risk, and verification — without a product-operated server in the critical path."
+  BookSection = "docs"
+  BookComments = false
 
 [minify]
   minifyOutput = true
