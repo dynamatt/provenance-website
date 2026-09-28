@@ -8,7 +8,8 @@ bookCollapseSection: true
 Every command of the `provenance` binary, generated from the same
 definitions as its `--help` output. Commands marked *Not yet implemented*
 are part of the planned command surface: in the current build they print
-`<command>: not implemented yet` and exit with code 2.
+`<command>: not implemented yet` and exit with code 2. Commands marked
+*In development* work in part while their implementation is completed.
 
 ## Commands
 
@@ -19,7 +20,7 @@ are part of the planned command surface: in the current build they print
 | [`component remove`]({{< relref "component-remove.md" >}}) | Remove a component submodule | — | Not yet implemented |
 | [`component update`]({{< relref "component-update.md" >}}) | Move a pinned component to a different commit | — | Not yet implemented |
 | [`diff`]({{< relref "diff.md" >}}) | Show a rendered, semantic diff between two git refs | `--entity` | Not yet implemented |
-| [`export`]({{< relref "export.md" >}}) | Export the design history file (website, pdf, docx) | `--out`, `--scope` | Not yet implemented |
+| [`export`]({{< relref "export.md" >}}) | Export the design history file (website, pdf, docx) | `--out`, `--scope` | In development |
 | [`fmt`]({{< relref "fmt.md" >}}) | Reformat entity files to canonical serialization | `--check` | Not yet implemented |
 | [`init`]({{< relref "init.md" >}}) | Scaffold a new project from a starter template | `--template` | Not yet implemented |
 | [`plugin`]({{< relref "plugin.md" >}}) | Invoke an installed plugin | — | Not yet implemented |

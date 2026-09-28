@@ -5,8 +5,8 @@ description: "Export the design history file (website, pdf, docx)"
 weight: 60
 ---
 
-> **Not yet implemented.** In the current build this command prints
-> `export: not implemented yet` and exits with code 2.
+> **In development.** Part of this command works in the current build.
+> This page describes its complete planned behaviour.
 
 ## Usage
 
