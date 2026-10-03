@@ -1,0 +1,163 @@
+---
+title: "Documents and query blocks"
+description: "Compose documents from live entities with wikilinks and query blocks."
+---
+
+A document, such as a system requirements specification, is an entity whose
+Markdown body mixes prose with references to other entities. The document
+file stores only the references. Every time the document is exported, they
+are resolved against the repository as it is then, so editing a requirement
+updates every document that shows it, with nothing to copy or keep in sync.
+
+There are two ways to pull entities into a document: wikilinks, for one
+entity you can name, and query blocks, for a set of entities chosen by a
+condition.
+
+## Wikilinks
+
+Wikilinks work in any Markdown: an entity's body and its `text` fields.
+
+| Syntax | Renders as |
+| --- | --- |
+| `[[REQ-0001]]` | A link to the entity, showing its ID. |
+| `[[REQ-0001\|the amplitude rule]]` | The same link with your own text. |
+| `[[REQ-0002#title]]` | The field's current value, linked to the entity. |
+| `![[REQ-0003]]` | The whole entity, rendered through its type's template. It must stand alone in its paragraph. |
+
+An ID that no entity has is shown marked *unresolved*; the export still
+succeeds. An entity that embeds itself, directly or through other embeds,
+stops the export, because the document would never end.
+
+## Query blocks
+
+A query block is a fenced code block with the info string `query`. It
+selects entities of one type, optionally filters and sorts them, and renders
+each one in place.
+
+````markdown
+## Requirements
+
+All approved requirements, in author-assigned order:
+
+```query
+from: Requirement
+where:
+  field: status
+  operator: equals
+  value: approved
+order_by: order
+```
+````
+
+| Key | Meaning |
+| --- | --- |
+| `from` | The entity type to select. Required. |
+| `where` | A condition the entities must meet. Without it, every entity of the type is selected. |
+| `order_by` | A field, or a list of fields, to sort by. |
+| `render` | How each entity is shown: `full`, `id` or `field:<name>`. Default `full`. |
+
+### Conditions
+
+A condition names a `field`, an `operator` and, for every operator except
+`exists`, a `value`. Operators are words, not symbols:
+
+| Operator | Holds when the field… |
+| --- | --- |
+| `equals` | has the value. |
+| `not_equals` | does not have the value. This includes a field with no value at all. |
+| `greater_than`, `less_than` | is above, or below, the value. |
+| `greater_or_equal`, `less_or_equal` | is at least, or at most, the value. |
+| `exists` | has at least one value. Takes no `value`. |
+
+A list of conditions means all of them must hold. `any_of` means at least
+one must hold:
+
+```yaml
+where:
+  - field: status
+    operator: equals
+    value: approved
+  - any_of:
+      - field: order
+        operator: less_than
+        value: 10
+      - field: verified_by
+        operator: exists
+```
+
+Each alternative in `any_of` is a condition or a list of conditions.
+`any_of` cannot contain another `any_of`.
+
+### What a condition can read
+
+| `field:` | Reads |
+| --- | --- |
+| `status` | A field of the entity. |
+| `verified_by` | A reverse link: the entities that link to this one through that `reverse_name`. |
+| `id`, `type` | The entity's ID and type. |
+| `{list: equipment_used, subfield: calibration_due_date}` | A sub-field of the entity's list rows. |
+| `{via: implements, field: status}` | A field of the entities this one links to, through a link or a reverse link. |
+
+`value` is a literal, or `{field: …}` to compare with another field of the
+same entity:
+
+```yaml
+where:
+  field: {list: equipment_used, subfield: calibration_due_date}
+  operator: less_than
+  value: {field: execution_date}
+```
+
+Some fields have several values: a link with `cardinality: many`, a reverse
+link, a list, or a field read `{via: …}` from several linked entities. Such
+a field matches when any of its values does, and `not_equals` holds only
+when none does. Several
+conditions on the same list in one list of conditions refer to the same
+row: the example below finds equipment that is both serial `A` and overdue,
+not one row of each.
+
+```yaml
+where:
+  - field: {list: equipment_used, subfield: serial_number}
+    operator: equals
+    value: A
+  - field: {list: equipment_used, subfield: calibration_due_date}
+    operator: less_than
+    value: {field: execution_date}
+```
+
+Values compare only with values of the same type. A link compares as the
+IDs it points to. Dates are written `YYYY-MM-DD`. A value is read by its
+YAML type, as in entity files, so a quoted `"2"` is text, not a number.
+[Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}) can be
+used in conditions and `order_by` like any other field.
+
+### Sorting
+
+`order_by` sorts ascending by each field in turn, then by ID. Entities
+without a value sort after those with one. A field with several values
+cannot be used.
+
+### Rendering
+
+| `render:` | Shows each entity as |
+| --- | --- |
+| `full` | The whole entity, through its type's template, like `![[ID]]`. Headings are nested under the heading the block sits in. |
+| `id` | A list of links showing IDs, like `[[ID]]`. |
+| `field:title` | A list of that field's values, each linked, like `[[ID#title]]`. |
+
+A query that matches nothing shows *No Requirement matches this query.*
+
+### Errors
+
+A query block that cannot be run stops the export with exit code `2`,
+naming the file and line, so a document is never published with a section
+silently missing:
+
+```text
+export: DOC/DOC-0001.md:29: query block: unknown operator "=" (valid operators: equals, not_equals, greater_or_equal, less_or_equal, greater_than, less_than, exists)
+```
+
+The same happens for an unknown type, field or sub-field, a value an enum
+does not allow, a value of the wrong type, and `greater_than` or `less_than`
+used on anything except numbers, dates and text.
