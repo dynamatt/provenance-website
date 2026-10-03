@@ -7,6 +7,13 @@ theme = "hugo-book"
 enableRobotsTXT = true
 summaryLength = 40
 
+# Don't copy file modification times into public/. On a devcontainer whose
+# workspace is a Windows drive mounted over 9p/drvfs (WSL2), every file is
+# owned by root, so the non-root user can't set mtimes and the build fails
+# with "chtimes .../public: operation not permitted". Mtimes in public/ are
+# not needed for serving or deployment.
+noTimes = true
+
 [markup.goldmark.renderer]
   unsafe = true
 
