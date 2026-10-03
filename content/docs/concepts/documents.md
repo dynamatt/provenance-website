@@ -161,3 +161,27 @@ export: DOC/DOC-0001.md:29: query block: unknown operator "=" (valid operators: 
 The same happens for an unknown type, field or sub-field, a value an enum
 does not allow, a value of the wrong type, and `greater_than` or `less_than`
 used on anything except numbers, dates and text.
+
+## Other fenced blocks
+
+Any other fenced code block is shown as code. Two more languages are
+reserved for diagrams, `mermaid` and `drawio`, which Provenance will render.
+Until it does, a block in one of them is shown as its source under a note
+saying it is not rendered by this version, so it is never mistaken for
+content.
+
+A project can limit the languages its entities use with a Block Language
+rule, which `provenance validate` will check once it is implemented. It
+reports blocks in a language outside the project's list, and blocks in a
+language this version of Provenance cannot render yet, even if listed.
+`none` stands for a block with no language.
+
+```yaml
+# rules/block-languages.yaml
+id: block-languages
+rule: BlockLanguage
+severity: error
+message: "code block in a language this project does not use, or that this version cannot render"
+entity_type: any
+allowed: [query, mermaid, text, none]
+```
