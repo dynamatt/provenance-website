@@ -1,6 +1,6 @@
 ---
 title: "Writing a schema"
-description: "Declare types, enums and records, and the field types they can use."
+description: "Declare entity types, enums and records, and the field types they can use."
 ---
 
 A project's schema lives in the `schema/` folder at the repository root. It
@@ -9,7 +9,7 @@ repository.
 
 ```
 schema/
-  Requirement.yaml       one file per type
+  Requirement.yaml       one file per entity type
   Risk.yaml
   enums/
     ApprovalStatus.yaml  one file per enum
@@ -17,15 +17,15 @@ schema/
     Equipment.yaml       one file per record: a shared row shape for lists
 ```
 
-Only `*.yaml` files directly in each folder are read. Types, enums and
-records share one namespace: no two declarations may have the same name,
+Only `*.yaml` files directly in each folder are read. Entity types, enums
+and records share one namespace: no two declarations may have the same name,
 and none may be named after a built-in field type.
 
-## Types
+## Entity types
 
-Each file in `schema/` declares one type of entity, such as a requirement
-or a risk: the type's name, its ID prefix and its fields, in the order they
-are shown.
+Each file in `schema/` declares one entity type, such as a requirement or a
+risk: the type's name, its ID prefix and its fields, in the order they are
+shown.
 
 ```yaml
 type: Requirement
@@ -52,7 +52,7 @@ must be unique within a type. The other field keys are:
 | `default` | any field | The value the field takes when it is not set. |
 | `help` | any field | Guidance shown to authors. |
 | `body` | `text` | Stores this field as the Markdown body below the frontmatter. At most one top-level `text` field per type may set it; a type without one has a freeform body. |
-| `target` | `link` | The types a link may point to, e.g. `[Requirement, Design]`. |
+| `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
 | `cardinality` | `link` | `one` (a single ID) or `many` (a list of IDs). Required. |
 | `reverse_name` | `link` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
 | `formula` | `calculated` | The expression the value is computed from. |
@@ -88,7 +88,7 @@ values: [draft, in_review, approved, deprecated]
 ```
 
 Use an enum for a label. When each value needs data of its own, such as a
-numeric severity score, make it a type instead, and link to it.
+numeric severity score, make it an entity type instead, and link to it.
 
 ## Links
 
@@ -123,7 +123,7 @@ both.
 ### Rows declared inline
 
 With `fields`, each item is a row with the given sub-fields. Use this when
-only one type uses that row shape.
+only one entity type uses that row shape.
 
 ```yaml
 # schema/Risk.yaml
@@ -175,15 +175,16 @@ verification_methods: [test, analysis]
 ```
 
 A list cannot hold `link`, `list` or `calculated` values. For a list of
-links, declare a `link` with `cardinality: many`. A list cannot name a
-type either: it would copy that type's fields without making a link, so
-link to the entities instead.
+links, declare a `link` with `cardinality: many`. A list cannot name an
+entity type either: it would copy that type's fields without making a link,
+so link to the entities instead.
 
 ## Records
 
-In a schema, a record is a named row shape, declared once in
-`schema/records/` and used by any list with `of`. Use one when several lists share a row shape, or to
-keep a long row shape out of a type's file.
+A record is a named row shape, declared once in `schema/records/` and used
+by any list with `of`. Use one when several entity types record the same
+kind of row, such as the equipment used in verification and validation
+tests.
 
 ```yaml
 # schema/records/Equipment.yaml
