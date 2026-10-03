@@ -55,7 +55,7 @@ must be unique within a type. The other field keys are:
 | `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
 | `cardinality` | `link` | `one` (a single ID) or `many` (a list of IDs). Required. |
 | `reverse_name` | `link` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
-| `formula` | `calculated` | The expression the value is computed from. |
+| `formula` | `calculated` | The expression the value is computed from. See [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | `fields` | `list` | The list's row fields, declared inline. |
 | `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
 
@@ -73,7 +73,7 @@ enforced and applied when `provenance validate` is implemented.
 | `boolean` | `true` or `false`. |
 | `link` | The ID of another entity (`cardinality: one`) or a list of IDs (`cardinality: many`). |
 | `list` | A list of rows, or of values of one type. See [Lists](#lists). |
-| `calculated` | Nothing: the value is never stored. It is computed from `formula`. |
+| `calculated` | Nothing: the value is never stored. It is computed from `formula`; see [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | *an enum's name* | One of the enum's values. |
 
 ## Enums

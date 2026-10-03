@@ -21,5 +21,7 @@ orientation, not a validated procedure or regulatory advice.
   and where to follow development.
 - [Core concepts]({{< relref "docs/concepts" >}}): entities, schemas, and typed links.
 - [Writing a schema]({{< relref "docs/concepts/schema" >}}): entity types, enums, records and field types.
+- [Documents and query blocks]({{< relref "docs/concepts/documents" >}}): compose documents from live entities.
+- [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}): values computed from a formula, such as risk ratings.
 - [Workflows]({{< relref "docs/workflows" >}}): the intended design-control lifecycle and its current release status.
 - [CLI reference]({{< relref "docs/cli" >}}): every command, its arguments and flags.
