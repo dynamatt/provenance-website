@@ -51,7 +51,7 @@ order_by: order
 
 | Key | Meaning |
 | --- | --- |
-| `from` | The entity type to select. Required. |
+| `from` | The entity type to select, or a list of types such as `[Risk, Requirement]`. Required. |
 | `where` | A condition the entities must meet. Without it, every entity of the type is selected. |
 | `order_by` | A field, or a list of fields, to sort by. |
 | `render` | How each entity is shown: `full`, `id` or `field:<name>`. Default `full`. |
@@ -140,6 +140,23 @@ used in conditions and `order_by` like any other field.
 without a value sort after those with one. A field with several values
 cannot be used.
 
+### Several types
+
+`from` can list several types. Their entities form one list, sorted
+together:
+
+```yaml
+from: [Risk, Requirement]
+order_by: order
+```
+
+Each result still renders through its own type's template. A field named
+in `where`, `order_by` or `render: field:` must exist on at least one of
+the types, with the same kind of value on every type that has it. On an
+entity whose type does not have the field, it is empty, as if it were
+unset: a test on it does not hold (so `not_equals` does), the entity sorts
+after those with a value, and `render: field:` marks it *empty*.
+
 ### Rendering
 
 | `render:` | Shows each entity as |
@@ -185,9 +202,10 @@ silently missing:
 export: DOC/DOC-0001.md:29: query block: unknown operator "=" (valid operators: equals, not_equals, greater_or_equal, less_or_equal, greater_than, less_than, exists)
 ```
 
-The same happens for an unknown type, field or sub-field, a value an enum
-does not allow, a value of the wrong type, and `greater_than` or `less_than`
-used on anything except numbers, dates and text.
+The same happens for an unknown type, field or sub-field, a field that none
+of the selected types has, a value an enum does not allow, a value of the
+wrong type, and `greater_than` or `less_than` used on anything except
+numbers, dates and text.
 
 ## Other fenced blocks
 
