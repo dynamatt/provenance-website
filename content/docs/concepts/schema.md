@@ -7,7 +7,7 @@ A project's schema lives in the `schema/` folder at the repository root. It
 is plain YAML, reviewed and versioned like every other file in the
 repository.
 
-```
+```text
 schema/
   Requirement.yaml       one file per entity type
   Risk.yaml
