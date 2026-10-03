@@ -24,5 +24,6 @@ addressed by a design record or verified by test evidence. Following these
 links forms a traceability graph across the project's design-control
 artifacts.
 
-The exact schema format and validation rules are still under development;
-this page describes the model, not a finalized file specification yet.
+[Writing a schema]({{< relref "docs/concepts/schema" >}}) describes the schema
+files, their field types, and how links and lists are declared. The
+validation rules are still under development.

@@ -20,5 +20,6 @@ orientation, not a validated procedure or regulatory advice.
 - [Getting started]({{< relref "docs/getting-started" >}}): current project status
   and where to follow development.
 - [Core concepts]({{< relref "docs/concepts" >}}): records, schemas, and typed links.
+- [Writing a schema]({{< relref "docs/concepts/schema" >}}): record types, enums, records and field types.
 - [Workflows]({{< relref "docs/workflows" >}}): the intended design-control lifecycle and its current release status.
 - [CLI reference]({{< relref "docs/cli" >}}): every command, its arguments and flags.
