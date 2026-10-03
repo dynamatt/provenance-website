@@ -55,6 +55,8 @@ order_by: order
 | `where` | A condition the entities must meet. Without it, every entity of the type is selected. |
 | `order_by` | A field, or a list of fields, to sort by. |
 | `render` | How each entity is shown: `full`, `id` or `field:<name>`. Default `full`. |
+| `template` | The template to use for each result. Use `template` for a single template or `templates` for a per-type map. If omitted, the default template for the entity's type is used. |
+| `templates` | A mapping from object type name to template name, so a query can mix objects of different types and still choose the right template for each result. |
 
 ### Conditions
 
@@ -145,6 +147,31 @@ cannot be used.
 | `full` | The whole entity, through its type's template, like `![[ID]]`. Headings are nested under the heading the block sits in. |
 | `id` | A list of links showing IDs, like `[[ID]]`. |
 | `field:title` | A list of that field's values, each linked, like `[[ID#title]]`. |
+
+### Custom templates
+
+Entities do not have to render the same way every time they are used. When a
+query does not specify a template, the default is derived from the entity's
+type name. For example, a `Requirement` type renders through the default
+`Requirement` template unless something else is requested.
+
+A query may override that default to suit a particular context. The override
+may apply to all results or, when a query mixes different object types, to
+specific types in the result set. This lets one document show a compact
+checklist view of requirements while another shows a detailed risk register,
+without creating separate object types for each presentation.
+
+```yaml
+from: [Requirement, Risk]
+templates:
+  Requirement: requirement-checklist
+  Risk: risk-summary
+```
+
+If a result's type is not listed in `templates`, it falls back to the default
+template for that type. A single-template override can also be written as
+`template: requirement-checklist` for a query that selects one type and all
+results should use the same presentation.
 
 A query that matches nothing shows *No Requirement matches this query.*
 
