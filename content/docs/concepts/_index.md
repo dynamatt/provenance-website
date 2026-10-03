@@ -10,5 +10,6 @@ connect entities into a traceability graph.
 Read about [entities and links]({{< relref "docs/concepts/entities-and-links" >}}),
 [writing a schema]({{< relref "docs/concepts/schema" >}}),
 [calculated fields]({{< relref "docs/concepts/calculated-fields" >}}),
-[documents and query blocks]({{< relref "docs/concepts/documents" >}}) and the
+[documents and query blocks]({{< relref "docs/concepts/documents" >}}),
+[exporting the DHF]({{< relref "docs/concepts/exporting" >}}) and the
 role of [Git in the audit trail]({{< relref "docs/concepts/git-and-audit-trail" >}}).

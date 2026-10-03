@@ -5,9 +5,6 @@ description: "Compute the whole-repository content hash"
 weight: 200
 ---
 
-> **Not yet implemented.** In the current build this command prints
-> `verify content: not implemented yet` and exits with code 2.
-
 ## Usage
 
 ```text

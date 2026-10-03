@@ -34,7 +34,7 @@ are part of the planned command surface: in the current build they print
 | [`validate`]({{< relref "validate.md" >}}) | Run the rule engine and report every violation | `--format`, `--path` | Not yet implemented |
 | [`verify`]({{< relref "verify.md" >}}) | Verify binary artifacts and repository content hashes | — | — |
 | [`verify artifact`]({{< relref "verify-artifact.md" >}}) | Check a binary against the published release manifest | `--path` | Not yet implemented |
-| [`verify content`]({{< relref "verify-content.md" >}}) | Compute the whole-repository content hash | `--commit`, `--expected` | Not yet implemented |
+| [`verify content`]({{< relref "verify-content.md" >}}) | Compute the whole-repository content hash | `--commit`, `--expected` | Available |
 | [`version`]({{< relref "version.md" >}}) | Print the tool version, source commit and Go toolchain | — | Available |
 
 ## Exit codes

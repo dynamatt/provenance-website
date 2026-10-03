@@ -25,7 +25,10 @@ Wikilinks work in any Markdown: an entity's body and its `text` fields.
 | `![[REQ-0003]]` | The whole entity, rendered through its type's template. It must stand alone in its paragraph. |
 
 An ID that no entity has is shown marked *unresolved*; the export still
-succeeds. An entity that embeds itself, directly or through other embeds,
+succeeds. A reference to a numbered figure or table shows its number, such
+as *Figure 1*; see
+[Numbered figures]({{< relref "docs/concepts/exporting#numbered-figures" >}}).
+An entity that embeds itself, directly or through other embeds,
 stops the export, because the document would never end.
 
 ## Query blocks
