@@ -56,7 +56,7 @@ order_by: order
 | `order_by` | A field, or a list of fields, to sort by. |
 | `render` | How each entity is shown: `full`, `id` or `field:<name>`. Default `full`. |
 | `template` | The template to use for each result. Use `template` for a single template or `templates` for a per-type map. If omitted, the default template for the entity's type is used. |
-| `templates` | A mapping from object type name to template name, so a query can mix objects of different types and still choose the right template for each result. |
+| `templates` | A mapping from entity type name to template name, so a query can mix entities of different types and still choose the right template for each result. |
 
 ### Conditions
 
@@ -161,22 +161,25 @@ after those with a value, and `render: field:` marks it *empty*.
 
 | `render:` | Shows each entity as |
 | --- | --- |
-| `full` | The whole entity, through its type's template, like `![[ID]]`. Headings are nested under the heading the block sits in. |
+| `full` | The whole entity, through its type's template or one the query chooses (see [Custom templates](#custom-templates)), like `![[ID]]`. Headings are nested under the heading the block sits in. |
 | `id` | A list of links showing IDs, like `[[ID]]`. |
 | `field:title` | A list of that field's values, each linked, like `[[ID#title]]`. |
+
+A query that matches nothing shows *No Requirement matches this query.*
 
 ### Custom templates
 
 Entities do not have to render the same way every time they are used. When a
 query does not specify a template, the default is derived from the entity's
 type name. For example, a `Requirement` type renders through the default
-`Requirement` template unless something else is requested.
+`Requirement` template (`templates/Requirement.tmpl`, or the built-in page if
+there is none) unless something else is requested.
 
 A query may override that default to suit a particular context. The override
-may apply to all results or, when a query mixes different object types, to
+may apply to all results or, when a query mixes different entity types, to
 specific types in the result set. This lets one document show a compact
 checklist view of requirements while another shows a detailed risk register,
-without creating separate object types for each presentation.
+without creating separate entity types for each presentation.
 
 ```yaml
 from: [Requirement, Risk]
@@ -187,10 +190,17 @@ templates:
 
 If a result's type is not listed in `templates`, it falls back to the default
 template for that type. A single-template override can also be written as
-`template: requirement-checklist` for a query that selects one type and all
-results should use the same presentation.
+`template: requirement-checklist`, which applies to every result whatever its
+type, typically in a query that selects one type.
 
-A query that matches nothing shows *No Requirement matches this query.*
+The templates a query names are files in `templates/`, called
+`templates/<name>.tmpl`, with a lower-case, hyphenated name such as
+`requirement-checklist.tmpl`. That keeps them apart from type templates
+(`Requirement.tmpl`) and the site layout (`_layout.tmpl`). A named template
+sees the same fields as the type's own template and is used only where a
+query asks for it, never for the entity's own page. `template` and
+`templates` apply to `render: full`, the mode that renders each result
+through a template.
 
 ### Errors
 
@@ -205,7 +215,10 @@ export: DOC/DOC-0001.md:29: query block: unknown operator "=" (valid operators: 
 The same happens for an unknown type, field or sub-field, a field that none
 of the selected types has, a value an enum does not allow, a value of the
 wrong type, and `greater_than` or `less_than` used on anything except
-numbers, dates and text.
+numbers, dates and text. For templates, it happens for a template that does
+not exist (even when the query matches nothing), a `templates` entry for a
+type the query does not select, and `template` and `templates` used
+together or with `render: id` or `field:`.
 
 ## Other fenced blocks
 
