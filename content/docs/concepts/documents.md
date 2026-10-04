@@ -23,11 +23,11 @@ Wikilinks work in any Markdown: an entity's body and its `text` fields.
 | `[[REQ-0001\|the amplitude rule]]` | The same link with your own text. |
 | `[[REQ-0002#title]]` | The field's current value, linked to the entity. |
 | `![[REQ-0003]]` | The whole entity, rendered through its type's template. It must stand alone in its paragraph. |
+| `[[#control-loop]]` | The number of a caption in this document, such as *Figure 1*, linked to it. |
 
 An ID that no entity has is shown marked *unresolved*; the export still
-succeeds. A reference to a numbered figure or table shows its number, such
-as *Figure 1*; see
-[Numbered figures]({{< relref "docs/concepts/exporting#numbered-figures" >}}).
+succeeds. Captions and references to them are described in
+[Images and captions]({{< relref "docs/concepts/exporting#captions" >}}).
 An entity that embeds itself, directly or through other embeds,
 stops the export, because the document would never end.
 
@@ -225,6 +225,8 @@ together or with `render: id` or `field:`.
 
 ## Other fenced blocks
 
+A `caption` block captions the block before it; see
+[Images and captions]({{< relref "docs/concepts/exporting#captions" >}}).
 Any other fenced code block is shown as code. Two more languages are
 reserved for diagrams, `mermaid` and `drawio`, which Provenance will render.
 Until it does, a block in one of them is shown as its source under a note
@@ -244,5 +246,5 @@ rule: BlockLanguage
 severity: error
 message: "code block in a language this project does not use, or that this version cannot render"
 entity_type: any
-allowed: [query, mermaid, text, none]
+allowed: [query, caption, mermaid, text, none]
 ```

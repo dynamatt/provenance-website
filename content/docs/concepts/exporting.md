@@ -6,7 +6,7 @@ description: "Export the design history file as a website, scope it to a documen
 `provenance export website` writes the design history file as a static
 website: a folder of HTML that works offline, with every entity on its own
 page. This page covers what goes into an export: its scope, the provenance
-stamped on every page, and how figures are numbered. The
+stamped on every page, and images and their captions. The
 [CLI reference]({{< relref "docs/cli/export" >}}) lists the flags.
 
 ## Scope
@@ -26,7 +26,7 @@ provenance export website --scope DOC/DOC-0001.md --out _doc
 ```
 
 `_doc/index.html` is then the requirements specification, and only the
-requirements and figures it shows have pages. Pointed at an entity that
+requirements it shows have pages. Pointed at an entity that
 pulls nothing in, the export holds that entity alone.
 
 **A query file.** A YAML file with `from` and an optional `where`, written
@@ -57,13 +57,17 @@ from. The built-in page layout shows it in the footer:
   working tree has uncommitted changes, so an export from uncommitted work
   can't pass for a committed one.
 - **This page last changed in**: the most recent commit that changed
-  anything the page shows: the entity's own file, everything it embeds or
-  queries, and the templates and schema that render it. Checking out that
-  commit reproduces the page exactly, even if the rest of the repository
-  has moved on.
+  anything the page shows. That is the entity's own file; everything it
+  embeds or queries; the entities its calculated fields read, such as the
+  severity levels behind a risk rating; its images; and the schema and
+  templates that render it. Checking out that commit reproduces the page's
+  content, even if the rest of the repository has moved on. The
+  stylesheet, and schema or templates the page does not use, do not
+  count.
 
 Each page also lists its **revision history**: every commit that changed
-what it shows, with date, author, change summary and any release tags.
+what it shows, by the same rule, with date, author, change summary and any
+release tags.
 
 Outside a git repository the export still works, without these stamps.
 
@@ -86,35 +90,70 @@ so can't be part of it. It is computed over the files exactly as git
 stores them, so a Windows checkout gives the same hash as any other. The
 exact algorithm is part of the product's validated design.
 
-## Numbered figures
+## Images and captions
 
-Figures, tables and other captioned entities are numbered in each document
-in the order they appear, like a word processor's captions. Which entity
-types are numbered, and how, is set in `templates/_captions.yaml`:
+### Images
+
+An image in an entity's Markdown is a file in the repository, written as a
+path relative to the entity's file, as in any Markdown viewer:
+
+```markdown
+![Closed-loop amplitude control](../assets/control-loop.svg)
+```
+
+A path starting with `/` is relative to the repository root. The export
+copies each image it uses into the site, so the site still works offline.
+SVG, PNG, JPEG, GIF and WebP files are supported. A web address, a path
+outside the repository or a missing file stops the export with exit code
+`2` at the line that uses it.
+
+### Captions
+
+Figures, tables and equations are numbered in each document in the order
+they appear, like a word processor's captions. A caption is written where
+the figure is used, so the same image can carry a different caption in
+each document. It is a `caption` block placed right after the image, table,
+embed or diagram it captions:
+
+````markdown
+![Closed-loop amplitude control](../assets/control-loop.svg)
+
+```caption
+kind: figure
+id: control-loop
+text: The blocks of the control loop, *as built*.
+```
+````
+
+| Key | Meaning |
+| --- | --- |
+| `kind` | `figure`, `table` or `equation`, or a kind added in `templates/_captions.yaml`. Required. |
+| `id` | A name for references to this caption. Letters, digits, `-` and `_`. |
+| `text` | The caption, in Markdown. |
+
+The block must come right after what it captions: a paragraph holding only
+an image, a table, an embedded entity (`![[ID]]`), a query block or other
+fenced block, or a block of HTML. Anywhere else the export stops with exit
+code `2`, so a caption is never attached to the wrong thing.
+
+A reference `[[#control-loop]]` becomes a link to the caption showing its
+number, such as *Figure 1*. This works even when the reference comes before
+the figure, and the numbers follow when figures are reordered.
+`[[#control-loop|the control loop]]` keeps its own text. Captions in an
+embedded entity are numbered as part of the document that embeds it.
+
+### Caption kinds
+
+Figures, tables and equations each have their own sequence: a document with
+two figures and a table has *Figure 1*, *Figure 2* and *Table 1*. A table's
+caption is placed above it, the others below. `templates/_captions.yaml`
+adds kinds, or changes the built-in ones:
 
 ```yaml
-Figure: [Figure]
-Table: [DataTable]
+diagram: Figure                           # numbered among the figures
+table: {label: Table, position: below}    # caption tables below them
 ```
 
-Each key is a label with its own sequence; it lists the types numbered in
-it. In a document that embeds two figures and a table, the figures are
-*Figure 1* and *Figure 2* and the table is *Table 1*.
-
-A reference to a numbered entity, `[[FIG-0001]]`, becomes a link to it
-within the document showing its number, such as *Figure 1*. This works
-even when the reference comes before the figure, and the numbers follow
-when figures are reordered. `[[FIG-0001|the control loop]]` keeps its own
-text. A reference to a figure the document does not include is an ordinary
-link to the figure's page.
-
-A template shows an entity's number with `.CaptionNumber`:
-
-```html
-<figure>
-{{markdown .Body}}
-<figcaption><strong>{{.CaptionNumber}}</strong> {{.Title}}</figcaption>
-</figure>
-```
-
-The built-in page shows the number and title below a numbered entity.
+Each kind maps to the label shown before its number, and optionally a
+position, `above` or `below`. Kinds with the same label share one
+sequence.
