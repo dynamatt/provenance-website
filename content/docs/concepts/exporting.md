@@ -127,7 +127,7 @@ text: The blocks of the control loop, *as built*.
 
 | Key | Meaning |
 | --- | --- |
-| `kind` | `figure`, `table` or `equation`, or a kind added in `templates/_captions.yaml`. Required. |
+| `kind` | `figure`, `table` or `equation`. Required. |
 | `id` | A name for references to this caption. Letters, digits, `-` and `_`. |
 | `text` | The caption, in Markdown. |
 
@@ -146,14 +146,6 @@ embedded entity are numbered as part of the document that embeds it.
 
 Figures, tables and equations each have their own sequence: a document with
 two figures and a table has *Figure 1*, *Figure 2* and *Table 1*. A table's
-caption is placed above it, the others below. `templates/_captions.yaml`
-adds kinds, or changes the built-in ones:
-
-```yaml
-diagram: Figure                           # numbered among the figures
-table: {label: Table, position: below}    # caption tables below them
-```
-
-Each kind maps to the label shown before its number, and optionally a
-position, `above` or `below`. Kinds with the same label share one
-sequence.
+caption is placed above it, the others below. The kinds are fixed; how a
+caption looks is up to the stylesheet, which can style each kind through its
+`captioned-figure`, `captioned-table` or `captioned-equation` class.
