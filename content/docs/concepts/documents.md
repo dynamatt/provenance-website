@@ -31,6 +31,53 @@ succeeds. Captions and references to them are described in
 An entity that embeds itself, directly or through other embeds,
 stops the export, because the document would never end.
 
+## Reference lists
+
+A document can end with a list of everything it cites, without the author
+writing the list. Every `[[ID]]`, `[[ID|text]]` and `[[ID#field]]` on the
+page is a citation, including those inside entities it embeds or renders
+in full through a query block. Embeds (`![[ID]]`), link fields and
+`[[#caption]]` references are not citations.
+
+The list is the template's job, like the revision history, so authors only
+cite. A type template receives the page's citations as `.Citations`, in
+the order they are first cited, each entity once. Each one carries its
+position among all the citations, `.CitationIndex`, and among the cited
+entities of its own type, `.TypeCitationIndex`. To list references at the
+end of every document, add them to `templates/Document.tmpl`:
+
+```go-html-template
+{{markdown .Body}}
+{{- with .Citations}}
+<h2>References</h2>
+<ol>
+{{- range .}}
+<li>{{link .}}: {{.Title}}</li>
+{{- end}}
+</ol>
+{{- end}}
+```
+
+`.Citations` is set only on the entity the page is about. It is empty when
+the same document is embedded in another or shown by a query, so a
+document inside a document doesn't repeat its list. The page layout,
+`templates/_layout.tmpl`, receives the same `.Citations`, for a list on
+every page. The built-in templates show no list.
+
+External sources, such as standards and papers, are entities too. Give
+them a type of their own, such as `Reference`, and cite them like anything
+else, `[[REF-0001]]`. A template tells them apart by type, for example to
+list them separately and number them:
+
+```go-html-template
+{{range .Citations}}{{if eq .Type "Reference"}}
+<li id="ref-{{.TypeCitationIndex}}">{{.Title}}</li>
+{{end}}{{end}}
+```
+
+A cited entity outside the export's scope is listed as its plain ID, and
+one that doesn't exist is marked *unresolved*.
+
 ## Query blocks
 
 A query block is a fenced code block with the info string `query`. It
