@@ -59,8 +59,9 @@ from. The built-in page layout shows it in the footer:
 - **This page last changed in**: the most recent commit that changed
   anything the page shows. That is the entity's own file; everything it
   embeds or queries; the entities its calculated fields read, such as the
-  severity levels behind a risk rating; its images; and the schema and
-  templates that render it. Checking out that commit reproduces the page's
+  severity levels behind a risk rating; its images; the entities it cites,
+  when its templates list its [references]({{< relref "docs/concepts/documents#reference-lists" >}});
+  and the schema and templates that render it. Checking out that commit reproduces the page's
   content, even if the rest of the repository has moved on. The
   stylesheet, and schema or templates the page does not use, do not
   count.
