@@ -36,8 +36,9 @@ stops the export, because the document would never end.
 A document can end with a list of everything it cites, without the author
 writing the list. Every `[[ID]]`, `[[ID|text]]` and `[[ID#field]]` on the
 page is a citation, including those inside entities it embeds or renders
-in full through a query block. Embeds (`![[ID]]`), link fields and
-`[[#caption]]` references are not citations.
+in full through a query block. Embeds (`![[ID]]`), link fields,
+`[[#caption]]` references and the entities a query block lists with
+`render: id` or `render: field:…` are not citations.
 
 The list is the template's job, like the revision history, so authors only
 cite. A type template receives the page's citations as `.Citations`, in
@@ -245,8 +246,11 @@ after those with a value, and `render: field:` marks it *empty*.
 | `render:` | Shows each entity as |
 | --- | --- |
 | `full` | The whole entity, through its type's template or one the query chooses (see [Custom templates](#custom-templates)), like `![[ID]]`. Headings are nested under the heading the block sits in. |
-| `id` | A list of links showing IDs, like `[[ID]]`. |
+| `id` | A list of links showing IDs, like `[[ID]]` without a [citation style](#citation-style). |
 | `field:title` | A list of that field's values, each linked, like `[[ID#title]]`. |
+
+A list made by `id` or `field:` is not a citation: its entities aren't in
+the page's [reference list](#reference-lists).
 
 A query that matches nothing shows *No Requirement matches this query.*
 
