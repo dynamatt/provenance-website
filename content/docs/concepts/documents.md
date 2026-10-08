@@ -78,6 +78,39 @@ list them separately and number them:
 A cited entity outside the export's scope is listed as its plain ID, and
 one that doesn't exist is marked *unresolved*.
 
+## Citation style
+
+How each inline citation looks is the project's choice too. Without a
+template, `[[REF-0001]]` shows the ID `REF-0001`. Add
+`templates/_cite.tmpl` and every `[[ID]]` and `[[ID|text]]` on a page is
+rendered through it instead. It receives the cited entity as in
+`.Citations`, with `.CitationIndex`, `.TypeCitationIndex` and
+`.CitationLabel`, the `text` after `|` (empty when there is none). Number
+the references and keep everything else as before:
+
+```go-html-template
+{{- if eq .Type "Reference" -}}
+[{{link . .TypeCitationIndex}}{{with .CitationLabel}}, {{.}}{{end}}]
+{{- else if .CitationLabel -}}
+{{link . .CitationLabel}}
+{{- else -}}
+{{link .}}
+{{- end}}
+```
+
+With this template, `[[REF-0001]]` shows `[1]` and `[[REF-0001|clause 7]]`
+shows `[1, clause 7]`, numbered in the same order as the list, while
+`[[REQ-0001]]` still shows `REQ-0001`. The numbers belong to the page: a
+requirement cited inside an embed is numbered in the page embedding it,
+and on its own page by its own citations. The file's final line break
+isn't part of the citation. `[[ID#field]]` and `[[#caption]]` keep their
+usual rendering. On the site's main page, which isn't about one entity,
+citations always render as they would without the template.
+
+`.CitationLabel`, `.CitationIndex` and `.TypeCitationIndex` are reserved:
+a schema can't declare fields named `citation_label`, `citation_index` or
+`type_citation_index`.
+
 ## Query blocks
 
 A query block is a fenced code block with the info string `query`. It
