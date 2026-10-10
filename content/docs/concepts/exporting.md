@@ -60,7 +60,8 @@ from. The built-in page layout shows it in the footer:
   anything the page shows. That is the entity's own file; everything it
   embeds or queries; the entities its calculated fields read, such as the
   severity levels behind a risk rating; its images; the entities it cites,
-  when its templates list its [references]({{< relref "docs/concepts/documents#reference-lists" >}});
+  when its templates list its [references]({{< relref "docs/concepts/documents#reference-lists" >}})
+  or the project has a [citation style]({{< relref "docs/concepts/documents#citation-style" >}});
   and the schema and templates that render it. Checking out that commit reproduces the page's
   content, even if the rest of the repository has moved on. The
   stylesheet, and schema or templates the page does not use, do not
