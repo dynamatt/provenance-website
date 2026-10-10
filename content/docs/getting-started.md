@@ -27,9 +27,37 @@ chmod +x provenance-linux-amd64
 ./provenance-linux-amd64 version
 ```
 
-On macOS, compare `shasum -a 256 provenance-darwin-arm64` with that file's
-line in `SHA256SUMS`. A binary whose hash doesn't match is not the one that
-was published: don't run it.
+A binary whose hash doesn't match is not the one that was published: don't
+run it.
+
+Each release has a binary for three platforms, and each one is run on its
+own platform before the release is published:
+
+| Platform | File |
+| --- | --- |
+| Linux, x86-64 | `provenance-linux-amd64` |
+| macOS, Apple silicon | `provenance-darwin-arm64` |
+| Windows, x86-64 | `provenance-windows-amd64.exe` |
+
+The binaries aren't yet signed by Apple or Microsoft. The SHA-256 check is
+what proves a download is the published binary, so check it first, then:
+
+- **macOS:** check with `shasum -a 256 provenance-darwin-arm64` and compare
+  the result with that file's line in `SHA256SUMS`. Gatekeeper blocks a
+  downloaded binary that isn't signed, so clear its quarantine before the
+  first run:
+
+  ```bash
+  xattr -d com.apple.quarantine provenance-darwin-arm64
+  chmod +x provenance-darwin-arm64
+  ./provenance-darwin-arm64 version
+  ```
+
+- **Windows:** check with
+  `Get-FileHash provenance-windows-amd64.exe -Algorithm SHA256` in
+  PowerShell and compare it with that file's line in `SHA256SUMS` (case
+  doesn't matter). SmartScreen may warn that the file is unrecognized:
+  choose *More info*, then *Run anyway*.
 
 To see what it does, export the worked example,
 [provenance-example](https://github.com/dynamatt/provenance-example):
