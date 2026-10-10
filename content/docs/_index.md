@@ -8,11 +8,12 @@ This documentation describes its product model and intended workflows.
 
 ## Release status
 
-Provenance is pre-release and under active development. The
+Provenance is pre-release and under active development. The first alpha
+release, `v0.1.0-alpha`, exports a design history file as a website. The
 [CLI reference]({{< relref "docs/cli" >}}) lists the full planned command
-surface, with each command marked until it is implemented. Installation
-instructions and validated procedures will be published when the
-corresponding product capabilities are ready. The material here is
+surface, with each command marked until it is implemented. Validated
+procedures will be published when the corresponding product capabilities
+are ready. The material here is
 orientation, not a validated procedure or regulatory advice.
 
 ## Start here
@@ -24,5 +25,6 @@ orientation, not a validated procedure or regulatory advice.
 - [Documents and query blocks]({{< relref "docs/concepts/documents" >}}): compose documents from live entities.
 - [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}): values computed from a formula, such as risk ratings.
 - [Exporting the DHF]({{< relref "docs/concepts/exporting" >}}): scoped exports, provenance on every page, images and captions.
+- [Templates]({{< relref "docs/concepts/templates" >}}): change how the exported website looks.
 - [Workflows]({{< relref "docs/workflows" >}}): the intended design-control lifecycle and its current release status.
 - [CLI reference]({{< relref "docs/cli" >}}): every command, its arguments and flags.

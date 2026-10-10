@@ -6,7 +6,8 @@ description: "Export the design history file as a website, scope it to a documen
 `provenance export website` writes the design history file as a static
 website: a folder of HTML that works offline, with every entity on its own
 page. This page covers what goes into an export: its scope, the provenance
-stamped on every page, and images and their captions. The
+stamped on every page, and images and their captions. [Templates]({{< relref "docs/concepts/templates" >}})
+describes how to change the way the site looks. The
 [CLI reference]({{< relref "docs/cli/export" >}}) lists the flags.
 
 ## Scope
