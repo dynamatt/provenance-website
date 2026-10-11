@@ -114,5 +114,5 @@ see it as blank:
 - a formula that depends on itself, directly or through other calculated
   fields: `formula depends on itself: Risk.a → Risk.b → Risk.a`
 
-These will also be reported by `provenance validate` once it is
-implemented.
+`provenance validate` reports each of these once, at the field's line in
+the schema, rather than on every entity.
