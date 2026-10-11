@@ -40,7 +40,7 @@ fields:
     help: "The shall-statement. Ref: ISO 13485 §7.3.3"
   - name: status
     type: ApprovalStatus
-    default: draft
+    required: true
 ```
 
 Every field has a `name` and a `type`. Field names are `snake_case`, and
@@ -49,7 +49,6 @@ must be unique within a type. The other field keys are:
 | Key | Applies to | Meaning |
 | --- | --- | --- |
 | `required` | any field | The field must be set. |
-| `default` | any field | The value the field takes when it is not set. |
 | `help` | any field | Guidance shown to authors. |
 | `body` | `text` | Stores this field as the Markdown body below the frontmatter. At most one top-level `text` field per type may set it; a type without one has a freeform body. |
 | `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
@@ -59,8 +58,11 @@ must be unique within a type. The other field keys are:
 | `fields` | `list` | The list's row fields, declared inline. |
 | `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
 
-`required` and `default` are recorded in the schema now; they will be
-enforced and applied when `provenance validate` is implemented.
+There are no default values. What an entity's file says is its whole
+value: a field the file leaves out is empty everywhere it is read, so a
+change to the schema never changes an entity whose file did not change.
+A field that must have a value says `required: true`, which
+`provenance validate` will enforce once it is implemented.
 
 ## Field types
 
