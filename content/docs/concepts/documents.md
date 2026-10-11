@@ -26,7 +26,11 @@ Wikilinks work in any Markdown: an entity's body and its `text` fields.
 | `[[#control-loop]]` | The number of a caption in this document, such as *Figure 1*, linked to it. |
 
 An ID that no entity has is shown marked *unresolved*; the export still
-succeeds. Captions and references to them are described in
+succeeds, but `provenance validate` reports it as an error at its line, as
+it does an `[[ID#field]]` naming a field the entity's type doesn't have, a
+`[[#id]]` with no caption of that id on the page, and an `![[ID]]` written
+inside running text, which is shown as a reference rather than embedded.
+Captions and references to them are described in
 [Images and captions]({{< relref "docs/concepts/exporting#captions" >}}).
 An entity that embeds itself, directly or through other embeds,
 stops the export, because the document would never end.
@@ -325,8 +329,8 @@ Until it does, a block in one of them is shown as its source under a note
 saying it is not rendered by this version, so it is never mistaken for
 content.
 
-`provenance validate`, once it is implemented, reports a block in a
-language this version cannot render yet, wherever it is. A project can
+`provenance validate` reports a block in a language this version cannot
+render yet, wherever it is. A project can
 also limit the languages its entities use with a rule over `code_blocks`,
 a list every entity has with one row per fenced block (`none` stands for
 a block with no language):
