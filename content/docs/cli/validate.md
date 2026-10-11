@@ -5,8 +5,8 @@ description: "Run the rule engine and report every violation"
 weight: 170
 ---
 
-> **Not yet implemented.** In the current build this command prints
-> `validate: not implemented yet` and exits with code 2.
+> **In development.** Part of this command works in the current build.
+> This page describes its complete planned behaviour.
 
 ## Usage
 
@@ -14,9 +14,15 @@ weight: 170
 provenance validate [flags]
 ```
 
-Run the rule engine against the current (or specified) graph state and print every violation, errors and warnings. Used locally, at the merge gate and at release-tag time.
+Check the repository and print every violation, errors and warnings: files that cannot be loaded, the built-in checks, and every rule in `rules/`. Used locally, at the merge gate and at release-tag time.
 
-`--format` selects the report: text (default), json for tooling, or junit/sarif so a git host can show violations natively. The exit code is the only guaranteed CI contract; the report formats are a convenience.
+Each violation is reported at its file and line:
+
+```text
+path:line: error|warning [rule-id] message (ENTITY-ID)
+```
+
+`--format` selects the report: text (default), json for tooling, or junit/sarif so a git host can show violations natively. `--out` writes the report to a file instead of standard output. The exit code is the only guaranteed CI contract; the report formats are a convenience.
 
 Exit codes: 0 no error-severity violations, 1 violations found, 2 tool or usage error.
 
@@ -25,4 +31,5 @@ Exit codes: 0 no error-severity violations, 1 violations found, 2 tool or usage 
 | Flag | Default | Description |
 | --- | --- | --- |
 | `--format format` | `text` | report format: text, json, junit or sarif |
+| `--out file` | — | write the report to file instead of standard output |
 | `--path path` | — | repository path to validate (default: the repository containing the current directory) |

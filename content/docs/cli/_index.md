@@ -31,7 +31,7 @@ are part of the planned command surface: in the current build they print
 | [`serve`]({{< relref "serve.md" >}}) | Start the local browser editor, rule-violation viewer and reports viewer | — | Not yet implemented |
 | [`sign`]({{< relref "sign.md" >}}) | Record an electronic signature against an entity or change request | — | Not yet implemented |
 | [`sign verify`]({{< relref "sign-verify.md" >}}) | Check signature records against the content they sign | `--all`, `--commit`, `--json`, `--scope` | Not yet implemented |
-| [`validate`]({{< relref "validate.md" >}}) | Run the rule engine and report every violation | `--format`, `--path` | Not yet implemented |
+| [`validate`]({{< relref "validate.md" >}}) | Run the rule engine and report every violation | `--format`, `--out`, `--path` | In development |
 | [`verify`]({{< relref "verify.md" >}}) | Verify binary artifacts and repository content hashes | — | — |
 | [`verify artifact`]({{< relref "verify-artifact.md" >}}) | Check a binary against the published release manifest | `--path` | Not yet implemented |
 | [`verify content`]({{< relref "verify-content.md" >}}) | Compute the whole-repository content hash | `--commit`, `--expected` | Available |
