@@ -335,7 +335,7 @@ a block with no language):
 # rules/block-languages.yaml
 severity: error
 message: "code block in a language this project does not use"
-from: [Requirement, Design, Document]
+from: any
 where:
   field: code_blocks
   where:
