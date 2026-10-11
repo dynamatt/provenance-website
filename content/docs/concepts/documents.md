@@ -144,6 +144,14 @@ order_by: order
 
 ### Conditions
 
+> **Changing in the next release.** Conditions are also how `provenance
+> validate`'s rules are written, and the next release extends them: a
+> `where` on a list or link field tests each row or linked entity on its
+> own, `value_of` compares with another field, and `missing`, `not_in`,
+> `duplicated`, aggregates such as `count`, and links followed to any depth
+> are added. `{list: …, subfield: …}` and `{via: …, field: …}` below are
+> replaced by the new `where`. This page describes the current release.
+
 A condition names a `field`, an `operator` and, for every operator except
 `exists`, a `value`. Operators are words, not symbols:
 
@@ -317,18 +325,21 @@ Until it does, a block in one of them is shown as its source under a note
 saying it is not rendered by this version, so it is never mistaken for
 content.
 
-A project can limit the languages its entities use with a Block Language
-rule, which `provenance validate` will check once it is implemented. It
-reports blocks in a language outside the project's list, and blocks in a
-language this version of Provenance cannot render yet, even if listed.
-`none` stands for a block with no language.
+`provenance validate`, once it is implemented, reports a block in a
+language this version cannot render yet, wherever it is. A project can
+also limit the languages its entities use with a rule over `code_blocks`,
+a list every entity has with one row per fenced block (`none` stands for
+a block with no language):
 
 ```yaml
 # rules/block-languages.yaml
-id: block-languages
-rule: BlockLanguage
 severity: error
-message: "code block in a language this project does not use, or that this version cannot render"
-entity_type: any
-allowed: [query, caption, mermaid, text, none]
+message: "code block in a language this project does not use"
+from: [Requirement, Design, Document]
+where:
+  field: code_blocks
+  where:
+    field: language
+    operator: not_in
+    value: [query, caption, mermaid, text, none]
 ```
