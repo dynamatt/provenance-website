@@ -62,7 +62,8 @@ There are no default values. What an entity's file says is its whole
 value: a field the file leaves out is empty everywhere it is read, so a
 change to the schema never changes an entity whose file did not change.
 A field that must have a value says `required: true`, which
-`provenance validate` will enforce once it is implemented.
+`provenance validate` enforces: a required field that is missing, empty,
+or an empty list is an error at the entity's `id:` line.
 
 ## Field types
 
@@ -225,5 +226,20 @@ schema cannot be read, for example when:
 - a list has neither `fields` nor `of`, or has both;
 - a record contains itself.
 
-Other problems, such as a link `target` that names no declared type, are
-reported by `provenance validate` once it is implemented.
+Other problems don't stop the schema loading; `provenance validate`
+reports each of them at its file and line:
+
+- a key the schema format doesn't have, such as `default`, or one that
+  doesn't apply to the field, such as `target` on a `string`;
+- a link `target` that names no declared type;
+- a formula that doesn't parse, names a field that doesn't exist, or
+  depends on itself;
+- a type without an `id_prefix`, or two types sharing one;
+- and, as warnings, an enum or record nothing uses, and an entity type
+  with no entities and no links to or from it.
+
+`provenance validate` also checks every entity against its type: fields
+the type doesn't declare, values of the wrong type or outside their enum,
+calculated fields written in the file, unknown sub-fields in list rows,
+and IDs that aren't the type's `id_prefix`, a hyphen and at least four
+digits.
