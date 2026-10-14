@@ -149,9 +149,8 @@ order_by: order
 ### Conditions
 
 > **More in the next release.** Conditions are also how `provenance
-> validate`'s rules are written. The next release adds `duplicated`,
-> aggregates such as `count` over a sub-query, and links followed to any
-> depth.
+> validate`'s rules are written. The next release adds links followed to
+> any depth.
 
 A condition names a `field`, an `operator` and, for most operators, a
 `value` or a `value_of`. Operators are words, not symbols:
@@ -165,6 +164,7 @@ A condition names a `field`, an `operator` and, for most operators, a
 | `not_in` | has none of a list of values, written `value: [a, b]`. This includes a field with no value at all. |
 | `exists` | has at least one value. Takes no `value`. |
 | `missing` | has no value. Takes no `value`. |
+| `duplicated` | has a value another selected entity also has. Takes no `value`. See [Duplicates](#duplicates). |
 
 `value` is a literal. `value_of` names another field to compare with:
 
@@ -251,6 +251,58 @@ where:
       operator: equals
       value: deprecated
 ```
+
+### Counting and summing
+
+`aggregation` turns the rows or linked entities into one number, which
+`operator` and `value` (or `value_of`) then test. This finds requirements
+that no verification protocol verifies:
+
+```yaml
+from: Requirement
+where:
+  field: verified_by
+  where:
+    field: type
+    operator: equals
+    value: VerificationProtocol
+  aggregation: {type: count}
+  operator: less_than
+  value: 1
+```
+
+| `type` | Gives |
+| --- | --- |
+| `count` | How many rows or linked entities match the `where`. |
+| `sum`, `min`, `max`, `avg` | The total, smallest, largest or average of a number `field` of each matching item, e.g. `{type: max, field: row_rating}`. |
+
+The `where` is optional: without it, every row or linked entity counts.
+Each item counts once, even when two have equal values. With no items,
+`count` and `sum` are 0, and `min`, `max` and `avg` have no value, so a
+comparison with them does not hold (`missing` does). These are the rules
+of [calculated fields]({{< relref "docs/concepts/calculated-fields" >}})'
+`COUNT`, `SUM`, `MIN`, `MAX` and `AVG`.
+
+### Duplicates
+
+`duplicated` holds when another entity of the `from` types has the same
+value. It finds copy-paste errors:
+
+```yaml
+from: Requirement
+where:
+  field: title
+  operator: duplicated
+```
+
+Both entities sharing the value match. A list of fields compares them
+together: `field: [title, status]` holds only when another entity has the
+same title *and* status. Values compare by type, so the number `2` and the
+text `"2"` differ, and an entity with no value never matches. The
+comparison is with every entity of the `from` types, whatever else the
+`where` asks; the other conditions then filter the result. `duplicated`
+compares single values, so it can't be used on a list, a many-link or a
+reverse link, or inside a `where` on rows or linked entities.
 
 Outside a `where`, a field with several values (a link with
 `cardinality: many`, a reverse link, a list) matches when any of its values
