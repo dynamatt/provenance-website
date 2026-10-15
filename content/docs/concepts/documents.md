@@ -164,7 +164,6 @@ A condition names a `field`, an `operator` and, for most operators, a
 | `not_in` | has none of a list of values, written `value: [a, b]`. This includes a field with no value at all. |
 | `exists` | has at least one value. Takes no `value`. |
 | `missing` | has no value. Takes no `value`. |
-| `duplicated` | has a value another selected entity also has. Takes no `value`. See [Duplicates](#duplicates). |
 
 `value` is a literal. `value_of` names another field to compare with:
 
@@ -283,26 +282,37 @@ comparison with them does not hold (`missing` does). These are the rules
 of [calculated fields]({{< relref "docs/concepts/calculated-fields" >}})'
 `COUNT`, `SUM`, `MIN`, `MAX` and `AVG`.
 
-### Duplicates
+### Other entities
 
-`duplicated` holds when another entity of the `from` types has the same
-value. It finds copy-paste errors:
+A `where` reaches the entity's own rows and the entities it links to. To
+compare an entity with others it has no link to, use `from` in place of
+`field`: the condition holds when some entity of that type (a list of
+types, or `any`) matches the `where` inside. As inside any `where`, `^`
+reads the entity being tested. This finds requirements whose title another
+requirement shares, likely a copy-paste error:
 
 ```yaml
 from: Requirement
 where:
-  field: title
-  operator: duplicated
+  from: Requirement
+  where:
+    - field: title
+      operator: equals
+      value_of: ^title
+    - field: id
+      operator: not_equals
+      value_of: ^id
 ```
 
-Both entities sharing the value match. A list of fields compares them
-together: `field: [title, status]` holds only when another entity has the
-same title *and* status. Values compare by type, so the number `2` and the
-text `"2"` differ, and an entity with no value never matches. The
-comparison is with every entity of the `from` types, whatever else the
-`where` asks; the other conditions then filter the result. `duplicated`
-compares single values, so it can't be used on a list, a many-link or a
-reverse link, or inside a `where` on rows or linked entities.
+The `id` test leaves out the requirement itself, which always has its own
+title. Both requirements sharing a title match. Add tests to narrow the
+comparison: `{field: status, operator: equals, value: approved}` inside
+compares only with approved requirements, and another `equals` with a
+`^` field compares a combination of fields. An entity with no title
+matches nothing, because a comparison with a blank never holds.
+
+`aggregation` works here too: `aggregation: {type: count}` with
+`operator: greater_than` and `value: 1` asks for at least two others.
 
 Outside a `where`, a field with several values (a link with
 `cardinality: many`, a reverse link, a list) matches when any of its values
