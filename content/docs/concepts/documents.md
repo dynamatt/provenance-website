@@ -148,16 +148,13 @@ order_by: order
 
 ### Conditions
 
-> **Changing in the next release.** Conditions are also how `provenance
-> validate`'s rules are written, and the next release extends them: a
-> `where` on a list or link field tests each row or linked entity on its
-> own, `value_of` compares with another field, and `missing`, `not_in`,
-> `duplicated`, aggregates such as `count`, and links followed to any depth
-> are added. `{list: …, subfield: …}` and `{via: …, field: …}` below are
-> replaced by the new `where`. This page describes the current release.
+> **More in the next release.** Conditions are also how `provenance
+> validate`'s rules are written. The next release adds `duplicated`,
+> aggregates such as `count` over a sub-query, and links followed to any
+> depth.
 
-A condition names a `field`, an `operator` and, for every operator except
-`exists`, a `value`. Operators are words, not symbols:
+A condition names a `field`, an `operator` and, for most operators, a
+`value` or a `value_of`. Operators are words, not symbols:
 
 | Operator | Holds when the field… |
 | --- | --- |
@@ -165,10 +162,21 @@ A condition names a `field`, an `operator` and, for every operator except
 | `not_equals` | does not have the value. This includes a field with no value at all. |
 | `greater_than`, `less_than` | is above, or below, the value. |
 | `greater_or_equal`, `less_or_equal` | is at least, or at most, the value. |
+| `not_in` | has none of a list of values, written `value: [a, b]`. This includes a field with no value at all. |
 | `exists` | has at least one value. Takes no `value`. |
+| `missing` | has no value. Takes no `value`. |
+
+`value` is a literal. `value_of` names another field to compare with:
+
+```yaml
+where:
+  field: approved_on
+  operator: greater_or_equal
+  value_of: submitted_on
+```
 
 A list of conditions means all of them must hold. `any_of` means at least
-one must hold:
+one must hold, and can contain further `any_of`s:
 
 ```yaml
 where:
@@ -183,9 +191,6 @@ where:
         operator: exists
 ```
 
-Each alternative in `any_of` is a condition or a list of conditions.
-`any_of` cannot contain another `any_of`.
-
 ### What a condition can read
 
 | `field:` | Reads |
@@ -193,36 +198,63 @@ Each alternative in `any_of` is a condition or a list of conditions.
 | `status` | A field of the entity. |
 | `verified_by` | A reverse link: the entities that link to this one through that `reverse_name`. |
 | `id`, `type` | The entity's ID and type. |
-| `{list: equipment_used, subfield: calibration_due_date}` | A sub-field of the entity's list rows. |
-| `{via: implements, field: status}` | A field of the entities this one links to, through a link or a reverse link. |
+| `^execution_date` | Inside a sub-query (below), a field of the entity around it. `^^` reads two levels out. |
 
-`value` is a literal, or `{field: …}` to compare with another field of the
-same entity:
+`from: any` selects every entity type.
 
-```yaml
-where:
-  field: {list: equipment_used, subfield: calibration_due_date}
-  operator: less_than
-  value: {field: execution_date}
-```
+### Rows and linked entities
 
-Some fields have several values: a link with `cardinality: many`, a reverse
-link, a list, or a field read `{via: …}` from several linked entities. Such
-a field matches when any of its values does, and `not_equals` holds only
-when none does. Several
-conditions on the same list in one list of conditions refer to the same
-row: the example below finds equipment that is both serial `A` and overdue,
-not one row of each.
+A `where` on a list field tests each of its rows on its own, and on a link
+or reverse link, each entity it reaches. The condition holds when at least
+one row or entity matches. Inside, field names are the row's sub-fields or
+the linked entity's fields, and `^` reads the entity the condition started
+from. This finds evidence recorded with equipment whose calibration was
+due before the test:
 
 ```yaml
+from: VerificationEvidence
 where:
-  - field: {list: equipment_used, subfield: serial_number}
-    operator: equals
-    value: A
-  - field: {list: equipment_used, subfield: calibration_due_date}
+  field: equipment_used
+  where:
+    field: calibration_due_date
     operator: less_than
-    value: {field: execution_date}
+    value_of: ^execution_date
 ```
+
+The conditions inside one `where` are about one row or entity. The example
+below finds equipment that is both serial `A` and overdue, not one row of
+each:
+
+```yaml
+where:
+  field: equipment_used
+  where:
+    - field: serial_number
+      operator: equals
+      value: A
+    - field: calibration_due_date
+      operator: less_than
+      value_of: ^execution_date
+```
+
+Two separate `where`s on the same list may each match a different row. A
+`where` can contain another, to follow a link from a linked entity:
+
+```yaml
+from: VerificationEvidence
+where:
+  field: tests
+  where:
+    field: verifies
+    where:
+      field: status
+      operator: equals
+      value: deprecated
+```
+
+Outside a `where`, a field with several values (a link with
+`cardinality: many`, a reverse link, a list) matches when any of its values
+does, and `not_equals` and `not_in` hold only when none does.
 
 Values compare only with values of the same type. A link compares as the
 IDs it points to. Dates are written `YYYY-MM-DD`. A value is read by its
