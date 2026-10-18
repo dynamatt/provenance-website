@@ -26,5 +26,6 @@ orientation, not a validated procedure or regulatory advice.
 - [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}): values computed from a formula, such as risk ratings.
 - [Exporting the DHF]({{< relref "docs/concepts/exporting" >}}): scoped exports, provenance on every page, images and captions.
 - [Templates]({{< relref "docs/concepts/templates" >}}): change how the exported website looks.
+- [Cookbook]({{< relref "docs/cookbook" >}}): recipes for common patterns, such as a glossary.
 - [Workflows]({{< relref "docs/workflows" >}}): the intended design-control lifecycle and its current release status.
 - [CLI reference]({{< relref "docs/cli" >}}): every command, its arguments and flags.
