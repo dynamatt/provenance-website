@@ -44,7 +44,11 @@ fields:
 ```
 
 Every field has a `name` and a `type`. Field names are `snake_case`, and
-must be unique within a type. The other field keys are:
+must be unique within a type. `code_blocks` is taken: it is the list of
+fenced blocks every entity has for
+[conditions]({{< relref "docs/concepts/documents#what-a-condition-can-read" >}}),
+so neither a field nor a `reverse_name` can use it. The other field keys
+are:
 
 | Key | Applies to | Meaning |
 | --- | --- | --- |
