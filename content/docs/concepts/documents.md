@@ -148,9 +148,7 @@ order_by: order
 
 ### Conditions
 
-> **More in the next release.** Conditions are also how `provenance
-> validate`'s rules are written. The next release adds links followed to
-> any depth.
+Conditions are also how `provenance validate`'s rules are written.
 
 A condition names a `field`, an `operator` and, for most operators, a
 `value` or a `value_of`. Operators are words, not symbols:
@@ -197,6 +195,7 @@ where:
 | `status` | A field of the entity. |
 | `verified_by` | A reverse link: the entities that link to this one through that `reverse_name`. |
 | `id`, `type` | The entity's ID and type. |
+| `code_blocks` | The entity's fenced code blocks, a list with one row per block (see [Other fenced blocks](#other-fenced-blocks)). |
 | `^execution_date` | Inside a sub-query (below), a field of the entity around it. `^^` reads two levels out. |
 
 `from: any` selects every entity type.
@@ -250,6 +249,31 @@ where:
       operator: equals
       value: deprecated
 ```
+
+### Links at any depth
+
+`transitive: true` on a link or reverse link follows it through the
+entities it reaches, and through theirs, to any depth: a requirement's
+parent, its parent's parent, and so on. Each step follows the field or
+reverse link of the same name on the entity reached. This finds
+requirements that are their own ancestor, a cycle in the decomposition:
+
+```yaml
+from: Requirement
+where:
+  field: parent_requirement
+  transitive: true
+  where:
+    field: id
+    operator: equals
+    value_of: ^id
+```
+
+Every requirement on the cycle matches. A cycle doesn't make the query run
+forever: each entity is reached once, however many paths lead to it.
+Without `where`, the condition holds when the link leads anywhere.
+`aggregation` counts the entities reached, such as a requirement's
+ancestors.
 
 ### Counting and summing
 
@@ -426,8 +450,10 @@ content.
 `provenance validate` reports a block in a language this version cannot
 render yet, wherever it is. A project can
 also limit the languages its entities use with a rule over `code_blocks`,
-a list every entity has with one row per fenced block (`none` stands for
-a block with no language):
+a list every entity has with one row per fenced block, in its body, its
+text fields and the text in its lists. Each row has `language`, the first
+word after the opening fence (`none` for a block with no language), and
+`line`, the opening fence's line in the file:
 
 ```yaml
 # rules/block-languages.yaml
