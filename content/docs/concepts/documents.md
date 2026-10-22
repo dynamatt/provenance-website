@@ -149,9 +149,8 @@ order_by: order
 ### Conditions
 
 > **More in the next release.** Conditions are also how `provenance
-> validate`'s rules are written. The next release adds `duplicated`,
-> aggregates such as `count` over a sub-query, and links followed to any
-> depth.
+> validate`'s rules are written. The next release adds links followed to
+> any depth.
 
 A condition names a `field`, an `operator` and, for most operators, a
 `value` or a `value_of`. Operators are words, not symbols:
@@ -251,6 +250,69 @@ where:
       operator: equals
       value: deprecated
 ```
+
+### Counting and summing
+
+`aggregation` turns the rows or linked entities into one number, which
+`operator` and `value` (or `value_of`) then test. This finds requirements
+that no verification protocol verifies:
+
+```yaml
+from: Requirement
+where:
+  field: verified_by
+  where:
+    field: type
+    operator: equals
+    value: VerificationProtocol
+  aggregation: {type: count}
+  operator: less_than
+  value: 1
+```
+
+| `type` | Gives |
+| --- | --- |
+| `count` | How many rows or linked entities match the `where`. |
+| `sum`, `min`, `max`, `avg` | The total, smallest, largest or average of a number `field` of each matching item, e.g. `{type: max, field: row_rating}`. |
+
+The `where` is optional: without it, every row or linked entity counts.
+Each item counts once, even when two have equal values. With no items,
+`count` and `sum` are 0, and `min`, `max` and `avg` have no value, so a
+comparison with them does not hold (`missing` does). These are the rules
+of [calculated fields]({{< relref "docs/concepts/calculated-fields" >}})'
+`COUNT`, `SUM`, `MIN`, `MAX` and `AVG`.
+
+### Other entities
+
+A `where` reaches the entity's own rows and the entities it links to. To
+compare an entity with others it has no link to, use `from` in place of
+`field`: the condition holds when some entity of that type (a list of
+types, or `any`) matches the `where` inside. As inside any `where`, `^`
+reads the entity being tested. This finds requirements whose title another
+requirement shares, likely a copy-paste error:
+
+```yaml
+from: Requirement
+where:
+  from: Requirement
+  where:
+    - field: title
+      operator: equals
+      value_of: ^title
+    - field: id
+      operator: not_equals
+      value_of: ^id
+```
+
+The `id` test leaves out the requirement itself, which always has its own
+title. Both requirements sharing a title match. Add tests to narrow the
+comparison: `{field: status, operator: equals, value: approved}` inside
+compares only with approved requirements, and another `equals` with a
+`^` field compares a combination of fields. An entity with no title
+matches nothing, because a comparison with a blank never holds.
+
+`aggregation` works here too: `aggregation: {type: count}` with
+`operator: greater_than` and `value: 1` asks for at least two others.
 
 Outside a `where`, a field with several values (a link with
 `cardinality: many`, a reverse link, a list) matches when any of its values
