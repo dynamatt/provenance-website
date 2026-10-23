@@ -84,3 +84,42 @@ rule is skipped; the others still run:
 
 A schema with errors stops every rule, since rules are checked against
 it, and the report says how many weren't run.
+
+## Reports for tools
+
+`--format` writes the same violations for other tools. The exit code is
+the same whichever you choose, and only the exit code is guaranteed:
+
+| Format | For |
+| --- | --- |
+| `text` | People. The default: one line per violation, as above. |
+| `json` | Scripts: `version`, `violations` (each with `rule`, `severity`, `message`, `entity`, `path`, `line`) and `summary` (`errors`, `warnings`, `rules_skipped`). |
+| `junit` | CI test reports. Every built-in check and every rule is a test case. An error fails its case; warnings are in its output, so they don't fail it. A rule that wasn't run is skipped. |
+| `sarif` | Code scanning: SARIF 2.1.0, with every check and rule described and each violation at its file and line. |
+
+`--out` writes the report to a file, creating its folders. On GitHub,
+upload the SARIF report so pull requests show each violation on its line.
+The job needs `permissions: security-events: write`, and the upload runs
+even when the gate fails:
+
+```yaml
+- run: provenance validate --format sarif --out validate.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  if: always()
+  with:
+    sarif_file: validate.sarif
+```
+
+On GitLab, a JUnit report lists the checks in the pipeline's *Tests* tab:
+
+```yaml
+validate:
+  script: provenance validate --format junit --out validate.xml
+  artifacts:
+    when: always
+    reports:
+      junit: validate.xml
+```
+
+Each run gives the same bytes for the same commit: no timestamps, and
+every path relative to the repository root.
