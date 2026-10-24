@@ -123,3 +123,62 @@ validate:
 
 Each run gives the same bytes for the same commit: no timestamps, and
 every path relative to the repository root.
+
+## Custom reports
+
+A project can write its own report as a template in `templates/reports/`.
+`--report <name>` renders `templates/reports/<name>.tmpl` in place of a
+`--format`. A name ending `.html` is an
+[`html/template`](https://pkg.go.dev/html/template), which escapes what it
+shows for HTML. Any other, such as `pr-summary.md`, is a
+[`text/template`](https://pkg.go.dev/text/template), which escapes nothing.
+The exit code is the same as without `--report`.
+
+A report template receives:
+
+| Name | Holds |
+| --- | --- |
+| `.Violations` | Every violation, in the order the text report lists them, each with `.Rule`, `.Severity`, `.Message`, `.Path`, `.Line` and `.Entity`. |
+| `.Rules` | Every built-in check, then every rule file, so a report can list the ones that passed. Each has `.ID`, `.Severity`, `.Message`, `.Builtin`, `.Path` (the rule file), `.Query` (its text), `.Skipped` (why it wasn't run, or empty) and its own `.Violations`. |
+| `.Summary` | `.Errors`, `.Warnings` and `.RulesSkipped`. |
+| `.Component` | `.Code` and `.Name`. |
+| `.GitSHA`, `.ContentHash`, `.Dirty` | The commit, the content hash (ending `-dirty` when the working tree differs from it) and whether it differs. Empty outside a git repository. |
+
+`.Entity` is the entity the violation is about, with the same fields as in
+a [type template]({{< relref "docs/concepts/templates#type-templates" >}}),
+or nothing when the violation is about no entity, such as a problem in a
+rule file. A built-in check's `.Message` is its short description.
+
+Reports have the template functions `link`, `href` and `short`, but not
+`markdown`. Links are relative to the exported site's main page, so a report
+written there links to each entity's page:
+
+```sh
+provenance export website
+provenance validate --report validation.html --out _site/validation.html
+```
+
+Export first: it empties its folder, and `--out` never does. A report
+listing every check, passed or not:
+
+```html
+<table>
+{{- range .Rules}}
+<tr>
+  <td><code>{{.ID}}</code> {{.Message}}</td>
+  <td>{{if .Skipped}}not run{{else if .Violations}}{{len .Violations}} violations{{else}}passed{{end}}</td>
+</tr>
+{{- end}}
+</table>
+<ul>
+{{- range .Violations}}
+  <li>{{.Severity}}: {{link .Entity}} {{.Message}} (<code>{{.Path}}:{{.Line}}</code>)</li>
+{{- end}}
+</ul>
+```
+
+Every run of `validate` renders every report template, with or without
+`--report`, so a broken one is caught at the merge gate. One that can't be
+parsed, or names something the data doesn't have, such as `.Summary.Failures`,
+is a `content/template` error at its line, and `--report` then writes nothing.
+A name with no template is a usage error, exit code `2`.
