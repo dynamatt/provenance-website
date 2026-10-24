@@ -148,7 +148,8 @@ order_by: order
 
 ### Conditions
 
-Conditions are also how `provenance validate`'s rules are written.
+Conditions are also how `provenance validate`'s
+[rules]({{< relref "docs/concepts/rules" >}}) are written.
 
 A condition names a `field`, an `operator` and, for most operators, a
 `value` or a `value_of`. Operators are words, not symbols:
