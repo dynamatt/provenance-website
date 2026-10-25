@@ -5,9 +5,6 @@ description: "Run the rule engine and report every violation"
 weight: 170
 ---
 
-> **In development.** Part of this command works in the current build.
-> This page describes its complete planned behaviour.
-
 ## Usage
 
 ```text
@@ -32,3 +29,48 @@ Exit codes: 0 no error-severity violations, 1 violations found, 2 tool or usage 
 | --- | --- | --- |
 | `--output name` | — | report to write, as name or name=file: text, json, junit, sarif or a report template; repeatable (default: text to standard output) |
 | `--path path` | — | repository path to validate (default: the repository containing the current directory) |
+
+## Built-in checks
+
+Every repository gets these checks, with no rule file, and they can't be
+turned off. Each is reported under its ID, like a rule, and an error fails
+the gate.
+
+| ID | Severity | Reports |
+| --- | --- | --- |
+| `content/caption` | error | A caption that cannot be placed or referred to |
+| `content/duplicate-id` | error | Two files with one ID |
+| `content/embed` | error | An embed inside running text |
+| `content/embed-cycle` | error | Entities that embed each other |
+| `content/frontmatter` | error | Frontmatter that cannot be read |
+| `content/image` | error | An image the website cannot publish |
+| `content/query` | error | A query block that cannot run |
+| `content/template` | error | A template that cannot render |
+| `content/template-name` | warning | A template named for nothing |
+| `content/unknown-override` | warning | An underscore template that overrides nothing |
+| `content/unrendered-block` | error | A block this version publishes only as source |
+| `content/unused-template` | warning | A named template no query chooses |
+| `links/target-type` | error | A link to an entity of the wrong type |
+| `links/unknown-field` | error | A field reference to a field the target does not have |
+| `links/unresolved` | error | A link to no entity |
+| `rules/file` | error | A rule file that is not a YAML mapping |
+| `rules/message` | error | A rule without a message |
+| `rules/name` | error | A rule file not named for a kebab-case ID |
+| `rules/query` | error | A rule whose query does not fit the schema |
+| `rules/severity` | error | A rule severity other than error or warning |
+| `rules/unknown-key` | error | A key a rule file does not have |
+| `schema/calculated-set` | error | A calculated field written in the file |
+| `schema/enum-value` | error | A value not in its enum |
+| `schema/file` | error | A schema file that cannot be loaded |
+| `schema/formula` | error | A calculated field whose formula cannot run |
+| `schema/id-format` | error | An ID that is not the type's form |
+| `schema/invalid-value` | error | A value not of its field's type |
+| `schema/link-target` | error | A link field targeting an undeclared type |
+| `schema/list-row` | error | A list row with a key its list does not have |
+| `schema/required` | error | A required field not set |
+| `schema/unknown-field` | error | A frontmatter key the type does not have |
+| `schema/unknown-key` | error | A key the schema language does not have |
+| `schema/unknown-type` | error | An entity of an undeclared type |
+| `schema/unused-enum` | warning | An enum no field uses |
+| `schema/unused-record` | warning | A record no list uses |
+| `schema/unused-type` | warning | A type with no entities and no links |
