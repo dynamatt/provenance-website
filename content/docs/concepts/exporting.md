@@ -58,7 +58,7 @@ from. The built-in page layout shows it in the footer:
   working tree has uncommitted changes, so an export from uncommitted work
   can't pass for a committed one.
 - **This page last changed in**: the most recent commit that changed
-  anything the page shows. That is the entity's own file; everything it
+  anything the page shows. That is the entity itself; everything it
   embeds or queries; the entities its calculated fields read, such as the
   severity levels behind a risk rating; its images; the entities it cites,
   when its templates list its [references]({{< relref "docs/concepts/documents#reference-lists" >}})
@@ -73,6 +73,14 @@ what it shows, by the same rule, with date, author, change summary and any
 release tags.
 
 Outside a git repository the export still works, without these stamps.
+
+The last-changed commits and revision history need the repository's whole
+history. In a shallow clone, such as the one `actions/checkout` makes by
+default, the export stops with an error rather than stamp pages with the
+oldest commit the clone happens to have: fetch the whole history, with
+`fetch-depth: 0` for `actions/checkout` or `git fetch --unshallow`.
+`provenance validate` needs only the commit checked out, so it runs in a
+shallow clone.
 
 ### Checking the content hash
 
