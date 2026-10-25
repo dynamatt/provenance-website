@@ -85,6 +85,171 @@ rule is skipped; the others still run:
 A schema with errors stops every rule, since rules are checked against
 it, and the report says how many weren't run.
 
+## Worked examples
+
+Each of these rules is in the example repository's
+[`rules/`](https://github.com/dynamatt/provenance-example/tree/main/rules)
+folder, one for each kind of check a design control process usually needs.
+The rule at the top of this page is the first kind: a field required only
+under a condition. A link to an entity that doesn't exist, or to one of a
+type its field doesn't allow, needs no rule: the built-in `links/…` checks
+report it.
+
+### Values in a set
+
+`not_in` reports a value outside a list, here of a plain text field that
+isn't an enum. It also matches an entity with no value:
+
+```yaml
+# rules/eco-change-type-valid.yaml
+severity: error
+message: "change_type must be one of the approved categories"
+from: ChangeRequest
+where:
+  field: change_type
+  operator: not_in
+  value: [correction, enhancement, safety]
+```
+
+### Counting links
+
+`aggregation` counts the entities a link reaches, here the protocols that
+verify a requirement, through the reverse link no requirement file writes:
+
+```yaml
+# rules/requirement-verified.yaml
+severity: warning
+message: "requirement missing verification"
+from: Requirement
+where:
+  field: verified_by
+  where:
+    field: type
+    operator: equals
+    value: VerificationProtocol
+  aggregation: {type: count}
+  operator: less_than
+  value: 1
+```
+
+### Comparing across a link
+
+A `where` on a link tests the linked entity, and `^` reads the entity the
+rule is checking. Evidence executed before the build it tested existed:
+
+```yaml
+# rules/evidence-after-build.yaml
+severity: error
+message: "executed before its build was built"
+from: VerificationEvidence
+where:
+  field: build_tested
+  where:
+    field: build_date
+    operator: greater_than
+    value_of: ^execution_date
+```
+
+### Comparing within an entity, row by row
+
+A `where` on a list tests each row on its own and reports each one that
+fails at its line. Equipment whose calibration had lapsed when the test ran:
+
+```yaml
+# rules/equipment-calibration-current.yaml
+severity: error
+message: "equipment calibration was not current at time of test execution"
+from: VerificationEvidence
+where:
+  field: equipment_used
+  where:
+    field: calibration_due_date
+    operator: less_than
+    value_of: ^execution_date
+```
+
+### No cycles
+
+`transitive: true` follows a link to any depth. A requirement that is its
+own ancestor, reported on every requirement of the cycle:
+
+```yaml
+# rules/no-requirement-decomposition-cycles.yaml
+severity: error
+message: "requirement decomposition hierarchy contains a cycle"
+from: Requirement
+where:
+  field: parent_requirement
+  transitive: true
+  where:
+    field: id
+    operator: equals
+    value_of: ^id
+```
+
+### Uniqueness
+
+A `where` with `from` looks among other entities, which no link reaches.
+Requirements sharing a title, each reported with the others it shares it
+with:
+
+```yaml
+# rules/requirement-title-unique.yaml
+severity: warning
+message: "two requirements share the same title — likely a duplicate or copy-paste error"
+from: Requirement
+where:
+  from: Requirement
+  where:
+    - field: title
+      operator: equals
+      value_of: ^title
+    - field: id
+      operator: not_equals
+      value_of: ^id
+```
+
+### Anything a query can find
+
+Any query is a rule: a project states its own conventions the same way.
+Requirements that implement a deprecated user need:
+
+```yaml
+# rules/no-implements-deprecated-need.yaml
+severity: warning
+message: "requirement implements a deprecated user need"
+from: Requirement
+where:
+  field: implements
+  where:
+    field: status
+    operator: equals
+    value: deprecated
+```
+
+### Code block languages
+
+Every entity has a `code_blocks` list, one row per fenced block, with its
+`language` (`none` for a fence with none). This limits the languages the
+project's Markdown may use:
+
+```yaml
+# rules/block-languages.yaml
+severity: error
+message: "code block in a language this project does not use"
+from: any
+where:
+  field: code_blocks
+  where:
+    field: language
+    operator: not_in
+    value: [query, caption, mermaid, text, none]
+```
+
+A diagram in a language this version can't render, such as `mermaid`, is
+reported by the built-in `content/unrendered-block` check whatever the
+rules allow, so it is never published as source text.
+
 ## Reports for tools
 
 `--output <name>` writes the same violations for other tools. The exit
@@ -205,3 +370,97 @@ parsed, or names something the data doesn't have, such as `.Summary.Failures`,
 is a `content/template` error at its line. Every report is rendered before
 any is written, so if one fails the run writes nothing. A name that is
 neither a format nor a report template is a usage error, exit code `2`.
+
+## Requiring the check
+
+`validate` is a merge gate only when the git host won't merge a change
+that fails it. Run it from a released binary, pinned to its version and
+the SHA-256 that version's `SHA256SUMS` gives it, so the gate is the binary
+you checked. The binary is the whole gate: the workflow only downloads it,
+checks it and runs it.
+
+On GitHub:
+
+```yaml
+# .github/workflows/validate.yml
+name: Validate
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    env:
+      PROVENANCE_VERSION: v0.2.0-alpha
+      # provenance-linux-amd64's line in that release's SHA256SUMS
+      PROVENANCE_SHA256: <sha256>
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Provenance
+        run: |
+          curl -fsSLo provenance "https://github.com/dynamatt/provenance/releases/download/$PROVENANCE_VERSION/provenance-linux-amd64"
+          echo "$PROVENANCE_SHA256  provenance" | sha256sum -c -
+          install -D -m 0755 provenance "$RUNNER_TEMP/bin/provenance" && rm provenance
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Validate
+        run: >-
+          provenance validate --output text
+          --output sarif=validate.sarif
+          --output pr-summary.md="$GITHUB_STEP_SUMMARY"
+      - uses: github/codeql-action/upload-sarif@v4
+        if: ${{ !cancelled() && hashFiles('validate.sarif') != '' }}
+        with:
+          sarif_file: validate.sarif
+```
+
+Then, in the repository's *Settings › Rules › Rulesets* (or *Branches*),
+protect the main branch and require the `validate` status check to pass
+before merging. The example repository's
+[*Validate* workflow](https://github.com/dynamatt/provenance-example/blob/main/.github/workflows/validate.yml)
+is this gate.
+
+On GitLab, run the same commands in a job, and turn on *Settings › Merge
+requests › Pipelines must succeed*:
+
+```yaml
+validate:
+  image: alpine:3
+  before_script:
+    - apk add --no-cache curl
+  variables:
+    PROVENANCE_VERSION: v0.2.0-alpha
+    PROVENANCE_SHA256: <sha256>
+  script:
+    - curl -fsSLo provenance "https://github.com/dynamatt/provenance/releases/download/$PROVENANCE_VERSION/provenance-linux-amd64"
+    - echo "$PROVENANCE_SHA256  provenance" | sha256sum -c -
+    - chmod +x provenance
+    - ./provenance validate --output text --output junit=validate.xml
+  artifacts:
+    when: always
+    reports:
+      junit: validate.xml
+```
+
+## Stricter review for schema and rules
+
+A change to `schema/` or `rules/` changes what every entity is checked
+against, so it deserves stricter review than a change to content. That
+review is a git host setting, not something `validate` can enforce. On
+GitHub and GitLab, name the reviewers in a `CODEOWNERS` file:
+
+```text
+# .github/CODEOWNERS (GitHub) or CODEOWNERS (GitLab)
+/schema/  @your-org/quality
+/rules/   @your-org/quality
+```
+
+Then require their approval: on GitHub, *Require review from Code Owners*
+in the main branch's ruleset or protection rule; on GitLab, *Code owner
+approval* on the protected branch. A pull request that changes a rule then
+can't merge until one of them approves it.
