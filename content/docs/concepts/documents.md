@@ -148,16 +148,11 @@ order_by: order
 
 ### Conditions
 
-> **Changing in the next release.** Conditions are also how `provenance
-> validate`'s rules are written, and the next release extends them: a
-> `where` on a list or link field tests each row or linked entity on its
-> own, `value_of` compares with another field, and `missing`, `not_in`,
-> `duplicated`, aggregates such as `count`, and links followed to any depth
-> are added. `{list: …, subfield: …}` and `{via: …, field: …}` below are
-> replaced by the new `where`. This page describes the current release.
+Conditions are also how `provenance validate`'s
+[rules]({{< relref "docs/concepts/rules" >}}) are written.
 
-A condition names a `field`, an `operator` and, for every operator except
-`exists`, a `value`. Operators are words, not symbols:
+A condition names a `field`, an `operator` and, for most operators, a
+`value` or a `value_of`. Operators are words, not symbols:
 
 | Operator | Holds when the field… |
 | --- | --- |
@@ -165,10 +160,21 @@ A condition names a `field`, an `operator` and, for every operator except
 | `not_equals` | does not have the value. This includes a field with no value at all. |
 | `greater_than`, `less_than` | is above, or below, the value. |
 | `greater_or_equal`, `less_or_equal` | is at least, or at most, the value. |
+| `not_in` | has none of a list of values, written `value: [a, b]`. This includes a field with no value at all. |
 | `exists` | has at least one value. Takes no `value`. |
+| `missing` | has no value. Takes no `value`. |
+
+`value` is a literal. `value_of` names another field to compare with:
+
+```yaml
+where:
+  field: approved_on
+  operator: greater_or_equal
+  value_of: submitted_on
+```
 
 A list of conditions means all of them must hold. `any_of` means at least
-one must hold:
+one must hold, and can contain further `any_of`s:
 
 ```yaml
 where:
@@ -183,9 +189,6 @@ where:
         operator: exists
 ```
 
-Each alternative in `any_of` is a condition or a list of conditions.
-`any_of` cannot contain another `any_of`.
-
 ### What a condition can read
 
 | `field:` | Reads |
@@ -193,36 +196,152 @@ Each alternative in `any_of` is a condition or a list of conditions.
 | `status` | A field of the entity. |
 | `verified_by` | A reverse link: the entities that link to this one through that `reverse_name`. |
 | `id`, `type` | The entity's ID and type. |
-| `{list: equipment_used, subfield: calibration_due_date}` | A sub-field of the entity's list rows. |
-| `{via: implements, field: status}` | A field of the entities this one links to, through a link or a reverse link. |
+| `code_blocks` | The entity's fenced code blocks, a list with one row per block (see [Other fenced blocks](#other-fenced-blocks)). |
+| `^execution_date` | Inside a sub-query (below), a field of the entity around it. `^^` reads two levels out. |
 
-`value` is a literal, or `{field: …}` to compare with another field of the
-same entity:
+`from: any` selects every entity type.
 
-```yaml
-where:
-  field: {list: equipment_used, subfield: calibration_due_date}
-  operator: less_than
-  value: {field: execution_date}
-```
+### Rows and linked entities
 
-Some fields have several values: a link with `cardinality: many`, a reverse
-link, a list, or a field read `{via: …}` from several linked entities. Such
-a field matches when any of its values does, and `not_equals` holds only
-when none does. Several
-conditions on the same list in one list of conditions refer to the same
-row: the example below finds equipment that is both serial `A` and overdue,
-not one row of each.
+A `where` on a list field tests each of its rows on its own, and on a link
+or reverse link, each entity it reaches. The condition holds when at least
+one row or entity matches. Inside, field names are the row's sub-fields or
+the linked entity's fields, and `^` reads the entity the condition started
+from. This finds evidence recorded with equipment whose calibration was
+due before the test:
 
 ```yaml
+from: VerificationEvidence
 where:
-  - field: {list: equipment_used, subfield: serial_number}
-    operator: equals
-    value: A
-  - field: {list: equipment_used, subfield: calibration_due_date}
+  field: equipment_used
+  where:
+    field: calibration_due_date
     operator: less_than
-    value: {field: execution_date}
+    value_of: ^execution_date
 ```
+
+The conditions inside one `where` are about one row or entity. The example
+below finds equipment that is both serial `A` and overdue, not one row of
+each:
+
+```yaml
+where:
+  field: equipment_used
+  where:
+    - field: serial_number
+      operator: equals
+      value: A
+    - field: calibration_due_date
+      operator: less_than
+      value_of: ^execution_date
+```
+
+Two separate `where`s on the same list may each match a different row. A
+`where` can contain another, to follow a link from a linked entity:
+
+```yaml
+from: VerificationEvidence
+where:
+  field: tests
+  where:
+    field: verifies
+    where:
+      field: status
+      operator: equals
+      value: deprecated
+```
+
+### Links at any depth
+
+`transitive: true` on a link or reverse link follows it through the
+entities it reaches, and through theirs, to any depth: a requirement's
+parent, its parent's parent, and so on. Each step follows the field or
+reverse link of the same name on the entity reached. This finds
+requirements that are their own ancestor, a cycle in the decomposition:
+
+```yaml
+from: Requirement
+where:
+  field: parent_requirement
+  transitive: true
+  where:
+    field: id
+    operator: equals
+    value_of: ^id
+```
+
+Every requirement on the cycle matches. A cycle doesn't make the query run
+forever: each entity is reached once, however many paths lead to it.
+Without `where`, the condition holds when the link leads anywhere.
+`aggregation` counts the entities reached, such as a requirement's
+ancestors.
+
+### Counting and summing
+
+`aggregation` turns the rows or linked entities into one number, which
+`operator` and `value` (or `value_of`) then test. This finds requirements
+that no verification protocol verifies:
+
+```yaml
+from: Requirement
+where:
+  field: verified_by
+  where:
+    field: type
+    operator: equals
+    value: VerificationProtocol
+  aggregation: {type: count}
+  operator: less_than
+  value: 1
+```
+
+| `type` | Gives |
+| --- | --- |
+| `count` | How many rows or linked entities match the `where`. |
+| `sum`, `min`, `max`, `avg` | The total, smallest, largest or average of a number `field` of each matching item, e.g. `{type: max, field: row_rating}`. |
+
+The `where` is optional: without it, every row or linked entity counts.
+Each item counts once, even when two have equal values. With no items,
+`count` and `sum` are 0, and `min`, `max` and `avg` have no value, so a
+comparison with them does not hold (`missing` does). These are the rules
+of [calculated fields]({{< relref "docs/concepts/calculated-fields" >}})'
+`COUNT`, `SUM`, `MIN`, `MAX` and `AVG`.
+
+### Other entities
+
+A `where` reaches the entity's own rows and the entities it links to. To
+compare an entity with others it has no link to, use `from` in place of
+`field`: the condition holds when some entity of that type (a list of
+types, or `any`) matches the `where` inside. As inside any `where`, `^`
+reads the entity being tested. This finds requirements whose title another
+requirement shares, likely a copy-paste error:
+
+```yaml
+from: Requirement
+where:
+  from: Requirement
+  where:
+    - field: title
+      operator: equals
+      value_of: ^title
+    - field: id
+      operator: not_equals
+      value_of: ^id
+```
+
+The `id` test leaves out the requirement itself, which always has its own
+title. Both requirements sharing a title match. Add tests to narrow the
+comparison: `{field: status, operator: equals, value: approved}` inside
+compares only with approved requirements, and another `equals` with a
+`^` field compares a combination of fields. An entity with no title
+matches nothing, because a comparison with a blank never holds.
+
+`aggregation` works here too: `aggregation: {type: count}` with
+`operator: greater_than` and `value: 1` asks for at least two others.
+
+Outside a `where`, a field with several values (a link with
+`cardinality: many`, a reverse link, a list) matches when any of its values
+does, and `not_equals` and `not_in` hold only when none does.
 
 Values compare only with values of the same type. A link compares as the
 IDs it points to. Dates are written `YYYY-MM-DD`. A value is read by its
@@ -332,8 +451,10 @@ content.
 `provenance validate` reports a block in a language this version cannot
 render yet, wherever it is. A project can
 also limit the languages its entities use with a rule over `code_blocks`,
-a list every entity has with one row per fenced block (`none` stands for
-a block with no language):
+a list every entity has with one row per fenced block, in its body, its
+text fields and the text in its lists. Each row has `language`, the first
+word after the opening fence (`none` for a block with no language), and
+`line`, the opening fence's line in the file:
 
 ```yaml
 # rules/block-languages.yaml

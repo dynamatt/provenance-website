@@ -16,8 +16,8 @@ project stage.
 
 ## Trying the alpha
 
-The `v0.1.0-alpha` release exports a design history file as a static
-website. Download the binary for your platform and `SHA256SUMS` from the
+The `v0.2.0-alpha` release exports a design history file as a static
+website and validates it at the merge gate. Download the binary for your platform and `SHA256SUMS` from the
 [releases page](https://github.com/dynamatt/provenance/releases), and check
 the binary before running it:
 
@@ -71,6 +71,19 @@ provenance export website
 Open `_site/index.html`. [Exporting the DHF]({{< relref "docs/concepts/exporting" >}})
 and [Templates]({{< relref "docs/concepts/templates" >}}) describe what the
 export contains and how to change it.
+
+Then check it:
+
+```bash
+provenance validate
+```
+
+It runs the built-in checks and the example's rules, and lists every
+violation at its file and line: the example has one warning, a requirement
+with no verification. Break something, such as a link to an entity that
+doesn't exist, and run it again: it reports the error and exits with code 1.
+[Rules]({{< relref "docs/concepts/rules" >}}) describes how to write rules
+and how to make `validate` a required check on pull requests.
 
 ## Before adopting the product
 
