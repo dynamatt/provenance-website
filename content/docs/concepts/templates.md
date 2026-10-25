@@ -18,7 +18,7 @@ wants to look different.
 | `templates/_layout.tmpl` | The built-in layout | The HTML around every page: head, header, footer, revision history. |
 | `templates/_index.tmpl` | The built-in main page | The site's `index.html`. |
 | `templates/style.css` | The built-in stylesheet | Every page. |
-| `templates/reports/<name>.tmpl` | Nothing | A report of `provenance validate --report <name>`, not part of the site. See [Custom reports]({{< relref "docs/concepts/rules#custom-reports" >}}). |
+| `templates/reports/<name>.tmpl` | Nothing | A report of `provenance validate --output <name>`, not part of the site. See [Custom reports]({{< relref "docs/concepts/rules#custom-reports" >}}). |
 
 Other files in `templates/`, such as a README, are ignored, as is a type
 template whose name matches no type in the schema.

@@ -22,7 +22,7 @@ Each violation is reported at its file and line:
 path:line: error|warning [rule-id] message (ENTITY-ID)
 ```
 
-`--format` selects the report: text (default), json for tooling, or junit/sarif so a git host can show violations natively. `--report` renders the project's own report from templates/reports/&lt;name&gt;.tmpl instead (html/template when the name ends `.html`, otherwise text/template). `--out` writes the report to a file instead of standard output. The exit code is the only guaranteed CI contract; the reports are a convenience.
+Each `--output` names a report: text, json for tooling, junit or sarif so a git host can show violations natively, or the project's own report from templates/reports/&lt;name&gt;.tmpl (html/template when the name ends `.html`, otherwise text/template). Repeat it to write several reports from one run. `--output` name=file writes the report to file; `--output` name writes it to standard output. With no `--output` the text report goes to standard output. Nothing is written unless every report renders. The exit code is the only guaranteed CI contract; the reports are a convenience.
 
 Exit codes: 0 no error-severity violations, 1 violations found, 2 tool or usage error.
 
@@ -30,7 +30,5 @@ Exit codes: 0 no error-severity violations, 1 violations found, 2 tool or usage 
 
 | Flag | Default | Description |
 | --- | --- | --- |
-| `--format format` | `text` | report format: text, json, junit or sarif |
-| `--out file` | — | write the report to file instead of standard output |
+| `--output name` | — | report to write, as name or name=file: text, json, junit, sarif or a report template; repeatable (default: text to standard output) |
 | `--path path` | — | repository path to validate (default: the repository containing the current directory) |
-| `--report name` | — | render templates/reports/name.tmpl instead of a --format |
