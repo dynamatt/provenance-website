@@ -87,8 +87,9 @@ it, and the report says how many weren't run.
 
 ## Reports for tools
 
-`--format` writes the same violations for other tools. The exit code is
-the same whichever you choose, and only the exit code is guaranteed:
+`--output <name>` writes the same violations for other tools. The exit
+code is the same whichever you choose, and only the exit code is
+guaranteed:
 
 | Format | For |
 | --- | --- |
@@ -97,15 +98,20 @@ the same whichever you choose, and only the exit code is guaranteed:
 | `junit` | CI test reports. Every built-in check and every rule is a test case. An error fails its case; warnings are in its output, so they don't fail it. A rule that wasn't run is skipped. |
 | `sarif` | Code scanning: SARIF 2.1.0, with every check and rule described and each violation at its file and line. |
 
-`--out` writes the report to a file, creating its folders. On GitHub,
-upload the SARIF report so pull requests show each violation on its line.
-The job needs `permissions: security-events: write`, and the upload runs
-even when the gate fails:
+`--output <name>=<file>` writes the report to a file instead, creating its
+folders. Repeat `--output` to write several reports from one run: at most
+one goes to standard output, and with no `--output` at all the text report
+does.
+
+On GitHub, upload the SARIF report so pull requests show each violation on
+its line, while the text report goes to the job's log. The job needs
+`permissions: security-events: write`. The upload runs even when the gate
+fails, as long as a report was written:
 
 ```yaml
-- run: provenance validate --format sarif --out validate.sarif
-- uses: github/codeql-action/upload-sarif@v3
-  if: always()
+- run: provenance validate --output text --output sarif=validate.sarif
+- uses: github/codeql-action/upload-sarif@v4
+  if: ${{ !cancelled() && hashFiles('validate.sarif') != '' }}
   with:
     sarif_file: validate.sarif
 ```
@@ -114,7 +120,7 @@ On GitLab, a JUnit report lists the checks in the pipeline's *Tests* tab:
 
 ```yaml
 validate:
-  script: provenance validate --format junit --out validate.xml
+  script: provenance validate --output text --output junit=validate.xml
   artifacts:
     when: always
     reports:
@@ -123,3 +129,79 @@ validate:
 
 Each run gives the same bytes for the same commit: no timestamps, and
 every path relative to the repository root.
+
+## Custom reports
+
+A project can write its own report as a template in `templates/reports/`.
+`--output <name>` with any name other than a format renders
+`templates/reports/<name>.tmpl`, so no report can be called `text`, `json`,
+`junit` or `sarif`. A name ending `.html` is an
+[`html/template`](https://pkg.go.dev/html/template), which escapes what it
+shows for HTML. Any other, such as `pr-summary.md`, is a
+[`text/template`](https://pkg.go.dev/text/template), which escapes nothing.
+The exit code is the same whichever reports you write.
+
+A report template receives:
+
+| Name | Holds |
+| --- | --- |
+| `.Violations` | Every violation, in the order the text report lists them, each with `.Rule`, `.Severity`, `.Message`, `.Path`, `.Line` and `.Entity`. |
+| `.Rules` | Every built-in check, then every rule file, so a report can list the ones that passed. Each has `.ID`, `.Severity`, `.Message`, `.Builtin`, `.Path` (the rule file), `.Query` (its text), `.Skipped` (why it wasn't run, or empty) and its own `.Violations`. |
+| `.Summary` | `.Errors`, `.Warnings` and `.RulesSkipped`. |
+| `.Component` | `.Code` and `.Name`. |
+| `.GitSHA`, `.ContentHash`, `.Dirty` | The commit, the content hash (ending `-dirty` when the working tree differs from it) and whether it differs. Empty outside a git repository. |
+
+`.Entity` is the entity the violation is about, with the same fields as in
+a [type template]({{< relref "docs/concepts/templates#type-templates" >}}),
+or nothing when the violation is about no entity, such as a problem in a
+rule file. A built-in check's `.Message` is its short description.
+
+Reports have the template functions `link`, `href` and `short`, but not
+`markdown`. Links are relative to the exported site's main page, so a report
+written there links to each entity's page:
+
+```sh
+provenance export website
+provenance validate --output validation.html=_site/validation.html
+```
+
+Export first: it empties its folder, and `--output` never does. A report
+listing every check, passed or not:
+
+```html
+<table>
+{{- range .Rules}}
+<tr>
+  <td><code>{{.ID}}</code> {{.Message}}</td>
+  <td>{{if .Skipped}}not run{{else if .Violations}}{{len .Violations}} violations{{else}}passed{{end}}</td>
+</tr>
+{{- end}}
+</table>
+<ul>
+{{- range .Violations}}
+  <li>{{.Severity}}: {{link .Entity}} {{.Message}} (<code>{{.Path}}:{{.Line}}</code>)</li>
+{{- end}}
+</ul>
+```
+
+A merge gate can write every report it needs from one run. On GitHub, a
+Markdown report written to `$GITHUB_STEP_SUMMARY` shows on the run's
+summary page:
+
+```yaml
+- run: >-
+    provenance validate --output text
+    --output sarif=validate.sarif
+    --output pr-summary.md="$GITHUB_STEP_SUMMARY"
+```
+
+The example repository's
+[*Validate* workflow](https://github.com/dynamatt/provenance-example/blob/main/.github/workflows/validate.yml)
+is a complete gate built this way.
+
+Every run of `validate` renders every report template, whether or not it
+writes it, so a broken one is caught at the merge gate. One that can't be
+parsed, or names something the data doesn't have, such as `.Summary.Failures`,
+is a `content/template` error at its line. Every report is rendered before
+any is written, so if one fails the run writes nothing. A name that is
+neither a format nor a report template is a usage error, exit code `2`.
