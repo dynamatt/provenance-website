@@ -105,13 +105,13 @@ does.
 
 On GitHub, upload the SARIF report so pull requests show each violation on
 its line, while the text report goes to the job's log. The job needs
-`permissions: security-events: write`, and the upload runs even when the
-gate fails:
+`permissions: security-events: write`. The upload runs even when the gate
+fails, as long as a report was written:
 
 ```yaml
 - run: provenance validate --output text --output sarif=validate.sarif
-- uses: github/codeql-action/upload-sarif@v3
-  if: always()
+- uses: github/codeql-action/upload-sarif@v4
+  if: ${{ !cancelled() && hashFiles('validate.sarif') != '' }}
   with:
     sarif_file: validate.sarif
 ```
@@ -194,6 +194,10 @@ summary page:
     --output sarif=validate.sarif
     --output pr-summary.md="$GITHUB_STEP_SUMMARY"
 ```
+
+The example repository's
+[*Validate* workflow](https://github.com/dynamatt/provenance-example/blob/main/.github/workflows/validate.yml)
+is a complete gate built this way.
 
 Every run of `validate` renders every report template, whether or not it
 writes it, so a broken one is caught at the merge gate. One that can't be
