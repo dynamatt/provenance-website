@@ -104,4 +104,22 @@
   .compare-table td:not(:first-child) { color: var(--muted); }
   .compare-table td:last-child { background: var(--accent-tint); color: var(--ink); }
   .compare-table tr:last-child td { border-bottom: none; }
+
+  /* Compare marks: a badge before the cell's text. The second content
+     declaration gives screen readers a word; browsers without the
+     alt-text syntax keep the first. */
+  .compare-table td.mk { position: relative; padding-left: 40px; }
+  .compare-table td.mk::before, .mk-key::before {
+    width: 18px; height: 18px; border-radius: 50%; box-sizing: border-box;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; line-height: 1; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .compare-table td.mk::before { position: absolute; left: 14px; top: 13px; }
+  .mk-y::before  { content: "✓"; content: "✓" / "Supported:"; background: var(--accent); color: var(--paper-raised); }
+  .mk-p::before  { content: "◐"; content: "◐" / "Partial:"; border: 1.5px solid var(--accent); color: var(--accent); font-size: 10px; }
+  .mk-pl::before { content: ""; content: "" / "Planned:"; border: 1.5px dashed var(--muted-2); }
+  .mk-n::before  { content: "✕"; content: "✕" / "Absent:"; background: var(--rust-tint); color: var(--rust); }
+  .mk-u::before  { content: "–"; content: "–" / "Not documented:"; border: 1.5px solid var(--border); color: var(--muted-2); }
+  .mk-legend { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0 0 14px; padding: 0; list-style: none; font-size: 12.5px; color: var(--muted); }
+  .mk-key { display: inline-flex; align-items: center; gap: 8px; }
 </style>
