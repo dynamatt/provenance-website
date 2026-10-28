@@ -9,6 +9,7 @@
 
 <!-- TABLE -->
 <div class="sec" style="padding-bottom: 64px;">
+  {{ partial "compare-legend.html" . }}
   <div class="hscroll" style="border: 1px solid var(--border); border-radius: 6px; background: var(--paper-raised);">
     <table class="compare-table" style="min-width: 1180px;">
       <tr>
@@ -22,57 +23,57 @@
       </tr>
       <tr>
         <td>Storage format</td>
-        <td>Proprietary, cloud</td>
-        <td>Proprietary, cloud</td>
-        <td>Proprietary DB, not user-operable</td>
-        <td>Proprietary</td>
-        <td>Proprietary, cloud</td>
-        <td>Open — git-native plain text</td>
+        <td class="mk mk-n">Proprietary, cloud</td>
+        <td class="mk mk-n">Proprietary, cloud</td>
+        <td class="mk mk-n">Proprietary DB, not user-operable</td>
+        <td class="mk mk-n">Proprietary</td>
+        <td class="mk mk-n">Proprietary, cloud</td>
+        <td class="mk mk-y">Open — git-native plain text</td>
       </tr>
       <tr>
         <td>Hosting model</td>
-        <td>Cloud-hosted only</td>
-        <td>Cloud-hosted only</td>
-        <td>Increasingly cloud-only</td>
-        <td>Not specified publicly</td>
-        <td>Cloud-based</td>
-        <td>Self-hosted, local-first</td>
+        <td class="mk mk-n">Cloud-hosted only</td>
+        <td class="mk mk-n">Cloud-hosted only</td>
+        <td class="mk mk-p">Increasingly cloud-only</td>
+        <td class="mk mk-u">Not specified publicly</td>
+        <td class="mk mk-n">Cloud-based</td>
+        <td class="mk mk-y">Self-hosted, local-first</td>
       </tr>
       <tr>
         <td>Change enforcement</td>
-        <td>Not documented</td>
-        <td>Not documented</td>
-        <td>Not documented</td>
-        <td>Visibility only — dependency diagrams</td>
-        <td>Not documented</td>
-        <td>Blocking merge gate</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-p">Visibility only — dependency diagrams</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-y">Blocking merge gate</td>
       </tr>
       <tr>
         <td>E-signatures (Part 11)</td>
-        <td>Compliant, full audit log</td>
-        <td>Reauth required, tamper-evident</td>
-        <td>Not detailed publicly</td>
-        <td>Compliant, user + timestamp</td>
-        <td>Automated routing, timestamped</td>
-        <td>Reauth + hash-bound tamper-evidence</td>
+        <td class="mk mk-y">Compliant, full audit log</td>
+        <td class="mk mk-y">Reauth required, tamper-evident</td>
+        <td class="mk mk-u">Not detailed publicly</td>
+        <td class="mk mk-y">Compliant, user + timestamp</td>
+        <td class="mk mk-y">Automated routing, timestamped</td>
+        <td class="mk mk-pl">Reauth + hash-bound tamper-evidence (planned)</td>
       </tr>
       <tr>
         <td>Regulator handoff</td>
-        <td>Not detailed publicly</td>
-        <td>Not detailed publicly</td>
-        <td>Not detailed publicly</td>
-        <td>Word / Excel export</td>
-        <td>Not detailed publicly</td>
-        <td>Offline static site + PDF/Word</td>
+        <td class="mk mk-u">Not detailed publicly</td>
+        <td class="mk mk-u">Not detailed publicly</td>
+        <td class="mk mk-u">Not detailed publicly</td>
+        <td class="mk mk-y">Word / Excel export</td>
+        <td class="mk mk-u">Not detailed publicly</td>
+        <td class="mk mk-y">Offline static site; PDF/Word planned</td>
       </tr>
       <tr>
         <td>Custom entity types</td>
-        <td>Not user-definable</td>
-        <td>Not user-definable</td>
-        <td>Not user-definable</td>
-        <td>Not user-definable</td>
-        <td>Not user-definable</td>
-        <td>Schema-as-code, no built-ins</td>
+        <td class="mk mk-n">Not user-definable</td>
+        <td class="mk mk-n">Not user-definable</td>
+        <td class="mk mk-n">Not user-definable</td>
+        <td class="mk mk-n">Not user-definable</td>
+        <td class="mk mk-n">Not user-definable</td>
+        <td class="mk mk-y">Schema-as-code, no built-ins</td>
       </tr>
     </table>
   </div>
@@ -88,6 +89,7 @@
 
 <!-- OPEN-SOURCE TABLE -->
 <div class="sec" style="padding-bottom: 64px;">
+  {{ partial "compare-legend.html" . }}
   <div class="hscroll" style="border: 1px solid var(--border); border-radius: 6px; background: var(--paper-raised);">
     <table class="compare-table" style="min-width: 940px;">
       <tr>
@@ -106,73 +108,73 @@
       </tr>
       <tr>
         <td>Storage format</td>
-        <td>YAML or Markdown, one file per item</td>
-        <td>Custom <code>.sdoc</code> grammar, one file per document</td>
-        <td>Directives inside RST or MyST pages</td>
-        <td>Markdown with YAML front matter, one file per entity</td>
+        <td class="mk mk-y">YAML or Markdown, one file per item</td>
+        <td class="mk mk-y">Custom <code>.sdoc</code> grammar, one file per document</td>
+        <td class="mk mk-y">Directives inside RST or MyST pages</td>
+        <td class="mk mk-y">Markdown with YAML front matter, one file per entity</td>
       </tr>
       <tr>
         <td>Custom entity types</td>
-        <td>None — each document is a type; checks are Python hooks</td>
-        <td>Per-document grammar with typed, required fields</td>
-        <td>Need types with JSON-Schema fields</td>
-        <td>Schema-as-code: types, enums, records, calculated fields</td>
+        <td class="mk mk-n">None — each document is a type; checks are Python hooks</td>
+        <td class="mk mk-y">Per-document grammar with typed, required fields</td>
+        <td class="mk mk-y">Need types with JSON-Schema fields</td>
+        <td class="mk mk-y">Schema-as-code: types, enums, records, calculated fields</td>
       </tr>
       <tr>
         <td>Link model</td>
-        <td>Untyped child-to-parent; documents form a tree</td>
-        <td>Parent, child, and file relations with roles</td>
-        <td>Typed links; cross-project links via <code>needs.json</code></td>
-        <td>Typed links, queried at any depth; cross-repo components planned</td>
+        <td class="mk mk-p">Untyped child-to-parent; documents form a tree</td>
+        <td class="mk mk-y">Parent, child, and file relations with roles</td>
+        <td class="mk mk-y">Typed links; cross-project links via <code>needs.json</code></td>
+        <td class="mk mk-y">Typed links, queried at any depth; cross-repo components planned</td>
       </tr>
       <tr>
         <td>Change enforcement</td>
-        <td>Exits non-zero on errors; warnings can be promoted</td>
-        <td>Not documented</td>
-        <td>Constraints and warnings can fail the build</td>
-        <td>Rules as queries; blocking merge gate with JUnit and SARIF reports</td>
+        <td class="mk mk-y">Exits non-zero on errors; warnings can be promoted</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-y">Constraints and warnings can fail the build</td>
+        <td class="mk mk-y">Rules as queries; blocking merge gate with JUnit and SARIF reports</td>
       </tr>
       <tr>
         <td>Change impact</td>
-        <td>Suspect links and review stamps from content fingerprints</td>
-        <td>On the backlog</td>
-        <td>Links pinned to a target's fingerprint fail when it changes</td>
-        <td>Per-entity history from git; stale-evidence rules planned</td>
+        <td class="mk mk-y">Suspect links and review stamps from content fingerprints</td>
+        <td class="mk mk-n">On the backlog</td>
+        <td class="mk mk-y">Links pinned to a target's fingerprint fail when it changes</td>
+        <td class="mk mk-pl">Per-entity history from git; stale-evidence rules planned</td>
       </tr>
       <tr>
         <td>E-signatures (Part 11)</td>
-        <td>None — a review stamp is a hash, without signer or time</td>
-        <td>None — approval is free-text metadata</td>
-        <td>None documented</td>
-        <td>Signature ledger in the repository, with re-authentication (planned)</td>
+        <td class="mk mk-n">None — a review stamp is a hash, without signer or time</td>
+        <td class="mk mk-n">None — approval is free-text metadata</td>
+        <td class="mk mk-u">None documented</td>
+        <td class="mk mk-pl">Signature ledger in the repository, with re-authentication (planned)</td>
       </tr>
       <tr>
         <td>Code and test traceability</td>
-        <td>File and keyword references, optionally hash-pinned</td>
-        <td>Markers in source code; JUnit import (experimental)</td>
-        <td>Markers in source code; JUnit import (companion extensions)</td>
-        <td>Evidence is an entity; no code markers or JUnit import yet</td>
+        <td class="mk mk-p">File and keyword references, optionally hash-pinned</td>
+        <td class="mk mk-y">Markers in source code; JUnit import (experimental)</td>
+        <td class="mk mk-y">Markers in source code; JUnit import (companion extensions)</td>
+        <td class="mk mk-n">Evidence is an entity; no code markers or JUnit import yet</td>
       </tr>
       <tr>
         <td>Interchange</td>
-        <td>CSV, TSV, and XLSX import and export</td>
-        <td>ReqIF (experimental), XLSX, and JSON</td>
-        <td>Versioned <code>needs.json</code></td>
-        <td>CSV-backed entity types and import plugins planned</td>
+        <td class="mk mk-y">CSV, TSV, and XLSX import and export</td>
+        <td class="mk mk-y">ReqIF (experimental), XLSX, and JSON</td>
+        <td class="mk mk-y">Versioned <code>needs.json</code></td>
+        <td class="mk mk-pl">CSV-backed entity types and import plugins planned</td>
       </tr>
       <tr>
         <td>Regulator handoff</td>
-        <td>HTML, Markdown, LaTeX, text</td>
-        <td>HTML, PDF, RST</td>
-        <td>Any Sphinx builder, including HTML and PDF</td>
-        <td>Offline static site, each page stamped with commit and content hash; PDF/Word planned</td>
+        <td class="mk mk-y">HTML, Markdown, LaTeX, text</td>
+        <td class="mk mk-y">HTML, PDF, RST</td>
+        <td class="mk mk-y">Any Sphinx builder, including HTML and PDF</td>
+        <td class="mk mk-y">Offline static site, each page stamped with commit and content hash; PDF/Word planned</td>
       </tr>
       <tr>
         <td>Diff between revisions</td>
-        <td>Not documented</td>
-        <td>Git changelog matched by stable machine IDs</td>
-        <td>Not documented</td>
-        <td>Per-page revision history; semantic diff planned</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-y">Git changelog matched by stable machine IDs</td>
+        <td class="mk mk-u">Not documented</td>
+        <td class="mk mk-p">Per-page revision history; semantic diff planned</td>
       </tr>
     </table>
   </div>
