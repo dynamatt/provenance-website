@@ -79,6 +79,106 @@
   <p style="margin: 14px 0 0; font-size: 13px; color: var(--muted-2); max-width: 900px;">Competitor cells reflect only what each vendor states on its own public marketing and product pages — no hands-on trials. Sources: <a href="https://www.greenlight.guru/design-control-software" class="link-muted">Greenlight&nbsp;Guru</a>, <a href="https://www.jamasoftware.com/solutions/medtech/" class="link-muted">Jama&nbsp;Connect</a>, <a href="https://www.siemens.com/en-us/products/polarion/polarion-x/" class="link-muted">Polarion</a>, <a href="https://3hti.com/alm/end-to-end-traceability-medical-device-development-codebeamer-alm/" class="link-muted">Codebeamer</a>, <a href="https://www.mastercontrol.com/gxp-lifeline/medical-device-design-history-file-21-cfr-part-820/" class="link-muted">MasterControl</a>.</p>
 </div>
 
+<!-- OPEN-SOURCE HEADER -->
+<div class="sec stack" style="padding-bottom: 32px; gap: 16px; max-width: 820px;">
+  <span class="mono eyebrow">Compared to open-source tools</span>
+  <h2 class="display" style="font-size: clamp(24px, 3.2vw, 32px); line-height: 1.2;">Docs-as-code tools already keep requirements in git.</h2>
+  <p class="lede">Doorstop, StrictDoc, and Sphinx-Needs share Provenance's starting point: plain-text records under version control, reviewed like code. They are built for general systems and safety engineering, not for design controls under 21 CFR Part 11, and none of them records who approved a change. Provenance is pre-release, so capabilities it does not have yet are marked <em>planned</em>.</p>
+</div>
+
+<!-- OPEN-SOURCE TABLE -->
+<div class="sec" style="padding-bottom: 64px;">
+  <div class="hscroll" style="border: 1px solid var(--border); border-radius: 6px; background: var(--paper-raised);">
+    <table class="compare-table" style="min-width: 940px;">
+      <tr>
+        <th>Capability</th>
+        <th>Doorstop</th>
+        <th>StrictDoc</th>
+        <th>Sphinx-Needs</th>
+        <th>Provenance</th>
+      </tr>
+      <tr>
+        <td>Built as</td>
+        <td>Python CLI, plus a local web server and an experimental desktop GUI</td>
+        <td>Python CLI, plus a local web editor</td>
+        <td>Sphinx extension (Python); builds with the docs</td>
+        <td>Single Go binary; local editor planned</td>
+      </tr>
+      <tr>
+        <td>Storage format</td>
+        <td>YAML or Markdown, one file per item</td>
+        <td>Custom <code>.sdoc</code> grammar, one file per document</td>
+        <td>Directives inside RST or MyST pages</td>
+        <td>Markdown with YAML front matter, one file per entity</td>
+      </tr>
+      <tr>
+        <td>Custom entity types</td>
+        <td>None — each document is a type; checks are Python hooks</td>
+        <td>Per-document grammar with typed, required fields</td>
+        <td>Need types with JSON-Schema fields</td>
+        <td>Schema-as-code: types, enums, records, calculated fields</td>
+      </tr>
+      <tr>
+        <td>Link model</td>
+        <td>Untyped child-to-parent; documents form a tree</td>
+        <td>Parent, child, and file relations with roles</td>
+        <td>Typed links; cross-project links via <code>needs.json</code></td>
+        <td>Typed links, queried at any depth; cross-repo components planned</td>
+      </tr>
+      <tr>
+        <td>Change enforcement</td>
+        <td>Exits non-zero on errors; warnings can be promoted</td>
+        <td>Not documented</td>
+        <td>Constraints and warnings can fail the build</td>
+        <td>Rules as queries; blocking merge gate with JUnit and SARIF reports</td>
+      </tr>
+      <tr>
+        <td>Change impact</td>
+        <td>Suspect links and review stamps from content fingerprints</td>
+        <td>On the backlog</td>
+        <td>Links pinned to a target's fingerprint fail when it changes</td>
+        <td>Per-entity history from git; stale-evidence rules planned</td>
+      </tr>
+      <tr>
+        <td>E-signatures (Part 11)</td>
+        <td>None — a review stamp is a hash, without signer or time</td>
+        <td>None — approval is free-text metadata</td>
+        <td>None documented</td>
+        <td>Signature ledger in the repository, with re-authentication (planned)</td>
+      </tr>
+      <tr>
+        <td>Code and test traceability</td>
+        <td>File and keyword references, optionally hash-pinned</td>
+        <td>Markers in source code; JUnit import (experimental)</td>
+        <td>Markers in source code; JUnit import (companion extensions)</td>
+        <td>Evidence is an entity; no code markers or JUnit import yet</td>
+      </tr>
+      <tr>
+        <td>Interchange</td>
+        <td>CSV, TSV, and XLSX import and export</td>
+        <td>ReqIF (experimental), XLSX, and JSON</td>
+        <td>Versioned <code>needs.json</code></td>
+        <td>CSV-backed entity types and import plugins planned</td>
+      </tr>
+      <tr>
+        <td>Regulator handoff</td>
+        <td>HTML, Markdown, LaTeX, text</td>
+        <td>HTML, PDF, RST</td>
+        <td>Any Sphinx builder, including HTML and PDF</td>
+        <td>Offline static site, each page stamped with commit and content hash; PDF/Word planned</td>
+      </tr>
+      <tr>
+        <td>Diff between revisions</td>
+        <td>Not documented</td>
+        <td>Git changelog matched by stable machine IDs</td>
+        <td>Not documented</td>
+        <td>Per-page revision history; semantic diff planned</td>
+      </tr>
+    </table>
+  </div>
+  <p style="margin: 14px 0 0; font-size: 13px; color: var(--muted-2); max-width: 900px;">Open-source cells reflect each project's own documentation as of October 2026: <a href="https://doorstop.readthedocs.io/en/latest/" class="link-muted">Doorstop&nbsp;3.2</a>, <a href="https://strictdoc.readthedocs.io/en/latest/latest/docs/strictdoc_01_user_guide.html" class="link-muted">StrictDoc&nbsp;0.30</a>, <a href="https://sphinx-needs.readthedocs.io/en/latest/" class="link-muted">Sphinx-Needs&nbsp;9.1</a>.</p>
+</div>
+
 <!-- SYNTHESIS -->
 <div class="sec" style="padding-bottom: 112px;">
   <div class="panel stack" style="gap: 18px; max-width: 900px;">
