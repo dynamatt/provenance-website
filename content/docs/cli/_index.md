@@ -21,7 +21,7 @@ are part of the planned command surface: in the current build they print
 | [`component update`]({{< relref "component-update.md" >}}) | Move a pinned component to a different commit | — | Not yet implemented |
 | [`diff`]({{< relref "diff.md" >}}) | Show a rendered, semantic diff between two git refs | `--entity` | Not yet implemented |
 | [`export`]({{< relref "export.md" >}}) | Export the design history file (website, pdf, docx) | `--out`, `--scope` | In development |
-| [`fmt`]({{< relref "fmt.md" >}}) | Reformat entity files to canonical serialization | `--check` | Not yet implemented |
+| [`fmt`]({{< relref "fmt.md" >}}) | Write entity files in canonical form | `--all`, `--check` | Available |
 | [`init`]({{< relref "init.md" >}}) | Scaffold a new project from a starter template | `--template` | Not yet implemented |
 | [`plugin`]({{< relref "plugin.md" >}}) | Invoke an installed plugin | — | Not yet implemented |
 | [`release`]({{< relref "release.md" >}}) | Run the release gate and create release tags | — | — |
