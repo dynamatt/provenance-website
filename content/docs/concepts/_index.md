@@ -13,6 +13,7 @@ Read about [entities and links]({{< relref "docs/concepts/entities-and-links" >}
 [documents and query blocks]({{< relref "docs/concepts/documents" >}}),
 [rules]({{< relref "docs/concepts/rules" >}}),
 [formatting]({{< relref "docs/concepts/formatting" >}}),
+[starter templates]({{< relref "docs/concepts/starter-templates" >}}),
 [exporting the DHF]({{< relref "docs/concepts/exporting" >}}),
 [templates]({{< relref "docs/concepts/templates" >}}) and the
 role of [Git in the audit trail]({{< relref "docs/concepts/git-and-audit-trail" >}}).

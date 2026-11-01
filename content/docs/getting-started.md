@@ -16,8 +16,9 @@ project stage.
 
 ## Trying the alpha
 
-The `v0.2.0-alpha` release exports a design history file as a static
-website and validates it at the merge gate. Download the binary for your platform and `SHA256SUMS` from the
+The latest alpha release starts a design history file, validates it at the
+merge gate, keeps its files in one canonical form and exports it as a
+static website. Download the binary for your platform and `SHA256SUMS` from the
 [releases page](https://github.com/dynamatt/provenance/releases), and check
 the binary before running it:
 
@@ -59,31 +60,46 @@ what proves a download is the published binary, so check it first, then:
   doesn't matter). SmartScreen may warn that the file is unrecognized:
   choose *More info*, then *Run anyway*.
 
-To see what it does, export the worked example,
-[provenance-example](https://github.com/dynamatt/provenance-example):
+## Start a project
+
+`init` writes a medical-device starter into a new folder:
 
 ```bash
-git clone https://github.com/dynamatt/provenance-example
-cd provenance-example
-provenance export website
-```
-
-Open `_site/index.html`. [Exporting the DHF]({{< relref "docs/concepts/exporting" >}})
-and [Templates]({{< relref "docs/concepts/templates" >}}) describe what the
-export contains and how to change it.
-
-Then check it:
-
-```bash
+provenance init my-device
+cd my-device
 provenance validate
 ```
 
-It runs the built-in checks and the example's rules, and lists every
-violation at its file and line: the example has one warning, a requirement
-with no verification. Break something, such as a link to an entity that
-doesn't exist, and run it again: it reports the error and exits with code 1.
-[Rules]({{< relref "docs/concepts/rules" >}}) describes how to write rules
-and how to make `validate` a required check on pull requests.
+`validate` reports `0 errors, 0 warnings`. The folder holds the record
+types a design history file needs, the checks a design review makes, and a
+small worked example of linked records, each titled "Example": a user
+need, the requirement answering it, a design output, a verification
+protocol and its evidence, a validation, a risk and a change request. Edit
+or delete them, then commit:
+
+```bash
+git add -A && git commit -m "Start the design history file"
+```
+
+[Starter templates]({{< relref "docs/concepts/starter-templates" >}})
+describes what the starter holds and how to adapt it, and how to switch on
+its CI gate.
+
+To see the site, export it and open `_site/index.html`:
+
+```bash
+provenance export website
+```
+
+[Exporting the DHF]({{< relref "docs/concepts/exporting" >}}) and
+[Templates]({{< relref "docs/concepts/templates" >}}) describe what the
+export contains and how to change it. Break something, such as a link to an
+entity that doesn't exist, and run `validate` again: it reports the error at
+its file and line, and exits with code 1.
+
+For a larger worked example, a stimulator's design history file with
+custom templates and more rules, clone
+[provenance-example](https://github.com/dynamatt/provenance-example).
 
 ## Before adopting the product
 
