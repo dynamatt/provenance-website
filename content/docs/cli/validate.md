@@ -42,6 +42,7 @@ the gate.
 | `content/duplicate-id` | error | Two files with one ID |
 | `content/embed` | error | An embed inside running text |
 | `content/embed-cycle` | error | Entities that embed each other |
+| `content/format` | warning | An entity file not in canonical form |
 | `content/frontmatter` | error | Frontmatter that cannot be read |
 | `content/image` | error | An image the website cannot publish |
 | `content/query` | error | A query block that cannot run |
