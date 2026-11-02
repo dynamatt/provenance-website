@@ -166,7 +166,7 @@ Each requirement then has its `anomalies`, and a rule can stop a release
 while a requirement has one that isn't fixed. A link to an ID that doesn't
 exist is reported at the row's line, as it would be in an entity file.
 
-A field can't be named `resolved`, `table` or another name the
+A field can't be named `resolved`, `file` or another name the
 [template data]({{< relref "docs/concepts/templates#type-templates" >}})
 already uses; map the column to another name with `column:`.
 
@@ -214,8 +214,9 @@ changed.
 Each row has its own page, `entities/<ID>.html`, which says which file it
 is a row of and where the file came from. Each file also has a table
 page, `entities/<Type>.html`: the file, its system, the date it was
-exported and its hash, the commit that last changed it, and its rows. The
-site's main page links each CSV-backed type to its table page.
+exported and its hash, and its rows, with the file's commits as its
+revision history. The site's main page links each CSV-backed type to its
+table page.
 
 With `pages: false`, rows have no pages of their own. The table page then
 shows every row in full, one column per field, and every link or citation
@@ -223,20 +224,26 @@ of a row points at its row there.
 
 ## In templates
 
-A row's `.Table` is the file it was read from; for an entity file it is
-nil, so `{{with .Table}}…{{end}}` shows something for rows only.
+A row is an entity, so a template reads it as any other: its fields, its
+`.Type`, its `.LastChangedSHA` and `.Revisions`. Every entity also has
+`.File`, the file it is written in, with the same keys for a Markdown
+file and a CSV row:
 
-| Accessor | Value |
-| --- | --- |
-| `.Table.Type` | The type of its rows. |
-| `.Table.File` | The file's path. |
-| `.Table.System` | The system it is a dump of; empty for a table kept by hand. |
-| `.Table.Sidecar`, `.Table.Exported`, `.Table.SHA256` | The sidecar's path and what it says. |
-| `.Table.Pages` | Whether its rows have pages of their own. |
-| `.Table.Commit`, `.Table.Date`, `.Table.Author` | The commit that last changed the file; empty outside git. |
+| Accessor | Markdown entity | CSV row |
+| --- | --- | --- |
+| `.File.Path` | `REQ/REQ-0001.md` | `data/complaints.csv` |
+| `.File.Line` | The line of its `id:` | The row's line |
+| `.File.System` | Empty | The system it is a dump of; empty for a table kept by hand |
+| `.File.Exported`, `.File.SHA256` | Empty | What the dump's sidecar says |
 
-On the [main page]({{< relref "docs/concepts/templates#main-page" >}}),
-each type group read from a file has the same `.Table`.
+```go-html-template
+{{with .File.System}}A dump of {{.}}, exported {{$.File.Exported}}.{{end}}
+```
+
+`link` and `href` point a row without a page of its own at its row on the
+table page. On the
+[main page]({{< relref "docs/concepts/templates#main-page" >}}), each type
+group read from a file has the file's `.File`, without `.Line`.
 
 ## History
 

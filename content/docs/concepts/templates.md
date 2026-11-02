@@ -42,7 +42,7 @@ schema's fields in PascalCase: `verified_by` becomes `.VerifiedBy`.
 | `.Resolved` | `true` for an entity that exists. See [links](#links). |
 | `.LastChangedSHA`, `.Revisions` | The page's [git stamps](#layout), also given to the layout. |
 | `.Citations` | What the page cites, on the entity the page is about. See [Reference lists]({{< relref "docs/concepts/documents#reference-lists" >}}). |
-| `.Table` | For a row of a CSV file, the file and where it came from; nil for an entity file. See [Importing data]({{< relref "docs/concepts/importing-data#in-templates" >}}). |
+| `.File` | The file the entity is written in: `.Path`, `.Line`, and for a row of a dump `.System`, `.Exported` and `.SHA256`. See [Importing data]({{< relref "docs/concepts/importing-data#in-templates" >}}). |
 
 A field the entity doesn't set is present and empty, so `{{with .Rationale}}`
 and `{{if .Rationale}}` work. A name the schema doesn't declare stops the
@@ -159,7 +159,7 @@ this page shows" is described in
 It receives `.Component` and `.Types`: every entity grouped by type, types
 in name order and entities by ID. Each group has `.Type` and `.Entities`,
 and each entity the same accessors as in its type template. A type read
-from a CSV file also has `.Table`, the file, whose page is
+from a CSV file also has `.File`, the file, whose page is
 `entities/<Type>.html`:
 
 ```go-html-template
