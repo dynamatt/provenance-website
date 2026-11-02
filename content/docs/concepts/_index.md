@@ -9,6 +9,7 @@ connect entities into a traceability graph.
 
 Read about [entities and links]({{< relref "docs/concepts/entities-and-links" >}}),
 [writing a schema]({{< relref "docs/concepts/schema" >}}),
+[importing data]({{< relref "docs/concepts/importing-data" >}}) from CSV files,
 [calculated fields]({{< relref "docs/concepts/calculated-fields" >}}),
 [documents and query blocks]({{< relref "docs/concepts/documents" >}}),
 [rules]({{< relref "docs/concepts/rules" >}}),

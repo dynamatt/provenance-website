@@ -43,6 +43,10 @@ fields:
     required: true
 ```
 
+A type can instead read its entities from a CSV file, one per row, by
+declaring a `source:`; its fields are declared the same way. See
+[Importing data]({{< relref "docs/concepts/importing-data" >}}).
+
 Every field has a `name` and a `type`. Field names are `snake_case`, and
 must be unique within a type. `code_blocks` is taken: it is the list of
 fenced blocks every entity has for
@@ -61,6 +65,7 @@ are:
 | `formula` | `calculated` | The expression the value is computed from. See [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | `fields` | `list` | The list's row fields, declared inline. |
 | `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
+| `column` | any field of a type with a `source` | The CSV header the field reads, when it isn't the field's name. |
 
 There are no default values. What an entity's file says is its whole
 value: a field the file leaves out is empty everywhere it is read, so a

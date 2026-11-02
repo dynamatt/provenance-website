@@ -39,6 +39,9 @@ the gate.
 | ID | Severity | Reports |
 | --- | --- | --- |
 | `content/caption` | error | A caption that cannot be placed or referred to |
+| `content/csv-column` | warning | A CSV column no field reads, or a field with no column |
+| `content/csv-row` | error | A CSV file or row that cannot be read |
+| `content/csv-sidecar` | error | A dump without a sidecar that describes it |
 | `content/duplicate-id` | error | Two files with one ID |
 | `content/embed` | error | An embed inside running text |
 | `content/embed-cycle` | error | Entities that embed each other |
