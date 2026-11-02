@@ -42,7 +42,7 @@ schema's fields in PascalCase: `verified_by` becomes `.VerifiedBy`.
 | `.Resolved` | `true` for an entity that exists. See [links](#links). |
 | `.LastChangedSHA`, `.Revisions` | The page's [git stamps](#layout), also given to the layout. |
 | `.Citations` | What the page cites, on the entity the page is about. See [Reference lists]({{< relref "docs/concepts/documents#reference-lists" >}}). |
-| `.File` | The file the entity is written in: `.Path`, `.Line`, and for a row of a dump `.System`, `.Exported` and `.SHA256`. See [Importing data]({{< relref "docs/concepts/importing-data#in-templates" >}}). |
+| `.File` | The file the entity is written in: `.Path`, and `.Line`, where its ID is written. See [Importing data]({{< relref "docs/concepts/importing-data#in-templates" >}}). |
 
 A field the entity doesn't set is present and empty, so `{{with .Rationale}}`
 and `{{if .Rationale}}` work. A name the schema doesn't declare stops the

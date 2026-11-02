@@ -41,9 +41,8 @@ from the field's name.
 type: Complaint
 id_prefix: CPL
 source:
-  csv: data/complaints.csv             # the file, from the repository root
-  system: Complaint handling (QMS-CH)  # where every dump comes from
-  id: complaint_no                     # the column holding each row's ID
+  csv: data/complaints.csv   # the file, from the repository root
+  id: complaint_no           # the column holding each row's ID
 fields:
   - name: title
     type: string
@@ -51,6 +50,10 @@ fields:
   - name: received
     type: date
     column: Date Received
+  - name: exported
+    type: date
+    column: Exported
+    required: true
   - name: product
     type: string
   - name: harm_occurred
@@ -60,8 +63,8 @@ fields:
 ```
 
 ```text
-complaint_no,Date Received,Subject,product,harm_occurred,summary
-CPL-2026-0141,2026-08-14,Signal loss when bending,"NP-100 lead kit, long",false,Lead fracture at the junction.
+complaint_no,Date Received,Exported,Subject,product,harm_occurred,summary
+CPL-2026-0141,2026-08-14,2026-09-30,Signal loss when bending,"NP-100 lead kit, long",false,Lead fracture at the junction.
 ```
 
 A Risk then links to its complaints, and a calculated field counts them:
@@ -83,7 +86,6 @@ The source's keys:
 | Key | Meaning |
 | --- | --- |
 | `csv` | The file, as a path from the repository root. Required. |
-| `system` | The system the file is a dump of. Leave it out for a [table kept by hand](#tables-kept-by-hand). |
 | `id` | The column holding each row's ID. Required. |
 | `delimiter` | The character between cells. Default `,`. |
 | `separator` | What separates the IDs or items in one cell. Default `;`. |
@@ -139,7 +141,6 @@ type: Anomaly
 id_prefix: BUG
 source:
   csv: data/anomalies.csv
-  system: Issue tracker (Jira)
   id: Key
   pages: false
 fields:
@@ -172,50 +173,35 @@ already uses; map the column to another name with `column:`.
 
 ## IDs
 
-A dump's rows keep the IDs their system gave them, so a record can be
-traced back to it: each must start with the type's `id_prefix` and a
-hyphen, such as `CPL-2026-0141`. A [table kept by
-hand](#tables-kept-by-hand) has IDs like any entity you write,
-`STD-0001`. Every ID is unique across the repository, rows and files
-alike.
+A row keeps the ID written in its ID column, so a record can be traced
+back to the system that gave it: each must start with the type's
+`id_prefix` and a hyphen, such as `CPL-2026-0141` or `STD-0001`. Every ID
+is unique across the repository, rows and files alike.
 
-## Dumps and their sidecar
+## Where a dump came from
 
-A copied file doesn't say when it was exported, so a type with a `system:`
-needs a sidecar beside each dump that does:
+Git records when a file entered the design history file and who
+committed it. Anything else you need to record about a dump, such as the
+date it was exported or the system it came from, is a field like any
+other: declare it, and the export carries it as a column. The complaints
+above declare `exported` as a required `date`, so `provenance validate`
+fails for a dump without it, and a rule or template can read it.
 
-```yaml
-# data/complaints.csv.yaml, rewritten with each dump
-exported: 2026-09-30
-sha256: 3b5c7e…    # sha256sum data/complaints.csv
-```
-
-`provenance validate` fails when the sidecar is missing, or when its hash
-isn't the file's, and `export` stops: a new dump can't be merged without
-saying when it was exported. Git records when the copy entered the design
-history file and who committed it.
-
-To bring in a new dump, replace the file, rewrite the sidecar and commit
-both:
-
-```bash
-sha256sum data/complaints.csv
-```
+To bring in a new dump, replace the file and commit it. A per-row export
+date changes every row, so each new dump moves every row's history; leave
+it out when that matters more than the date.
 
 ## Tables kept by hand
 
-A type whose `source:` has no `system:` is a table your team keeps in the
-repository, such as a standards register. It needs no sidecar. Edit it in
-a spreadsheet or a text editor; its pull request's diff shows the rows that
-changed.
+A table your team keeps in the repository, such as a standards register,
+is read the same way. Edit it in a spreadsheet or a text editor; its pull
+request's diff shows the rows that changed.
 
 ## Pages
 
 Each row has its own page, `entities/<ID>.html`, which says which file it
-is a row of and where the file came from. Each file also has a table
-page, `entities/<Type>.html`: the file, its system, the date it was
-exported and its hash, and its rows, with the file's commits as its
-revision history. The site's main page links each CSV-backed type to its
+is a row of. Each file also has a table page, `entities/<Type>.html`: the
+file and its rows, with the file's commits as its revision history. The site's main page links each CSV-backed type to its
 table page.
 
 With `pages: false`, rows have no pages of their own. The table page then
@@ -233,24 +219,22 @@ file and a CSV row:
 | --- | --- | --- |
 | `.File.Path` | `REQ/REQ-0001.md` | `data/complaints.csv` |
 | `.File.Line` | The line of its `id:` | The row's line |
-| `.File.System` | Empty | The system it is a dump of; empty for a table kept by hand |
-| `.File.Exported`, `.File.SHA256` | Empty | What the dump's sidecar says |
 
 ```go-html-template
-{{with .File.System}}A dump of {{.}}, exported {{$.File.Exported}}.{{end}}
+<p>{{.File.Path}}:{{.File.Line}}</p>
 ```
 
 `link` and `href` point a row without a page of its own at its row on the
 table page. On the
 [main page]({{< relref "docs/concepts/templates#main-page" >}}), each type
-group read from a file has the file's `.File`, without `.Line`.
+group read from a file has the file's `.File`, its `.Path` alone.
 
 ## History
 
 A row changes when one of the cells its fields read changes, so a dump
 that reorders columns or adds one changes no row. A new dump moves the
 *last changed* commit of the rows it changed and of the table page, not
-every row's, though every row's page shows the new dump's date.
+every row's.
 
 ## What validate reports
 
@@ -258,7 +242,6 @@ every row's, though every row's page shows the new dump's date.
 | --- | --- | --- |
 | `content/csv-row` | error | A missing or unreadable file, a header naming a column twice or without the ID column, a row with the wrong number of cells or no ID, a quote out of place. |
 | `content/csv-column` | warning | A column no field reads, and a field whose column is missing, so a column renamed in the source system is noticed. |
-| `content/csv-sidecar` | error | A dump without a sidecar, or one whose date isn't one or whose hash isn't the file's. |
 
 A cell's value, enum, link or ID is checked by the same check as in an
 entity file, at the row's line: `schema/invalid-value`,
