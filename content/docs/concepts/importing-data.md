@@ -50,10 +50,6 @@ fields:
   - name: received
     type: date
     column: Date Received
-  - name: exported
-    type: date
-    column: Exported
-    required: true
   - name: product
     type: string
   - name: harm_occurred
@@ -63,8 +59,8 @@ fields:
 ```
 
 ```text
-complaint_no,Date Received,Exported,Subject,product,harm_occurred,summary
-CPL-2026-0141,2026-08-14,2026-09-30,Signal loss when bending,"NP-100 lead kit, long",false,Lead fracture at the junction.
+complaint_no,Date Received,Subject,product,harm_occurred,summary
+CPL-2026-0141,2026-08-14,Signal loss when bending,"NP-100 lead kit, long",false,Lead fracture at the junction.
 ```
 
 A Risk then links to its complaints, and a calculated field counts them:
@@ -180,16 +176,21 @@ is unique across the repository, rows and files alike.
 
 ## Where a dump came from
 
-Git records when a file entered the design history file and who
-committed it. Anything else you need to record about a dump, such as the
-date it was exported or the system it came from, is a field like any
-other: declare it, and the export carries it as a column. The complaints
-above declare `exported` as a required `date`, so `provenance validate`
-fails for a dump without it, and a rule or template can read it.
+Git dates every row. To bring in a new dump, replace the file and commit
+it: the commit records when the copy entered the design history file and
+who brought it in. Each row's page shows when that row last changed, and
+its revision history lists every commit that changed it, so a new dump
+moves only the rows it changed.
 
-To bring in a new dump, replace the file and commit it. A per-row export
-date changes every row, so each new dump moves every row's history; leave
-it out when that matters more than the date.
+```bash
+cp ~/Downloads/complaints-2026-10-31.csv data/complaints.csv
+git commit -am "Complaints dump of 2026-10-31"
+```
+
+If you also want to record the date a dump was exported, or the system
+it came from, declare a field for it, such as a `date` column, like any
+other. A per-row export date changes every row on each dump, though, so
+every row's history moves with it.
 
 ## Tables kept by hand
 
