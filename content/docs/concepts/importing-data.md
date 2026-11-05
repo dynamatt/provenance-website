@@ -85,7 +85,6 @@ The source's keys:
 | `id` | The column holding each row's ID. Required. |
 | `delimiter` | The character between cells. Default `,`. |
 | `separator` | What separates the IDs or items in one cell. Default `;`. |
-| `pages` | `false` for no page per row, for a large file: the rows are shown on the [table page](#pages). Default `true`. |
 
 The file is RFC 4180 CSV in UTF-8 with a header row, which is what
 spreadsheets and most systems export; a byte-order mark and CRLF line
@@ -135,10 +134,10 @@ affects:
 # schema/Anomaly.yaml
 type: Anomaly
 id_prefix: BUG
+pages: false            # shown together on one page, below
 source:
   csv: data/anomalies.csv
   id: Key
-  pages: false
 fields:
   - name: title
     type: string
@@ -201,13 +200,14 @@ request's diff shows the rows that changed.
 ## Pages
 
 Each row has its own page, `entities/<ID>.html`, which says which file it
-is a row of. Each file also has a table page, `entities/<Type>.html`: the
-file and its rows, with the file's commits as its revision history. The site's main page links each CSV-backed type to its
-table page.
-
-With `pages: false`, rows have no pages of their own. The table page then
-shows every row in full, one column per field, and every link or citation
-of a row points at its row there.
+is a row of. For a large file, or a few small rows that read better
+together, give the type
+[`pages: false`]({{< relref "docs/concepts/schema#entities-without-pages" >}}),
+as any type may: its rows then have no pages of their own, and are shown
+together on the [type page]({{< relref "docs/concepts/templates#type-pages" >}}),
+`entities/<Type>.html`, where every link or citation of a row points. A
+CSV file has no page of its own otherwise; to list its rows, write a
+Document with a query block.
 
 ## In templates
 
@@ -225,8 +225,8 @@ file and a CSV row:
 <p>{{.File.Path}}:{{.File.Line}}</p>
 ```
 
-`link` and `href` point a row without a page of its own at its row on the
-table page. On the
+`link` and `href` point a row without a page of its own at its place on
+the type page. On the
 [main page]({{< relref "docs/concepts/templates#main-page" >}}), each type
 group read from a file has the file's `.File`, its `.Path` alone.
 
@@ -234,8 +234,7 @@ group read from a file has the file's `.File`, its `.Path` alone.
 
 A row changes when one of the cells its fields read changes, so a dump
 that reorders columns or adds one changes no row. A new dump moves the
-*last changed* commit of the rows it changed and of the table page, not
-every row's.
+*last changed* commit of the rows it changed, not every row's.
 
 ## What validate reports
 

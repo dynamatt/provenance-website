@@ -17,6 +17,7 @@ wants to look different.
 | `templates/_cite.tmpl` | The plain ID of `[[ID]]` | Every inline citation. See [Citation style]({{< relref "docs/concepts/documents#citation-style" >}}). |
 | `templates/_layout.tmpl` | The built-in layout | The HTML around every page: head, header, footer, revision history. |
 | `templates/_index.tmpl` | The built-in main page | The site's `index.html`. |
+| `templates/_<Type>.tmpl` | The built-in type page | The page of a type with `pages: false`, `entities/<Type>.html`. See [Type pages](#type-pages). |
 | `templates/style.css` | The built-in stylesheet | Every page. |
 | `templates/reports/<name>.tmpl` | Nothing | A report of `provenance validate --output <name>`, not part of the site. See [Custom reports]({{< relref "docs/concepts/rules#custom-reports" >}}). |
 
@@ -158,14 +159,15 @@ this page shows" is described in
 `templates/_index.tmpl` is the content of `index.html`, inside the layout.
 It receives `.Component` and `.Types`: every entity grouped by type, types
 in name order and entities by ID. Each group has `.Type` and `.Entities`,
-and each entity the same accessors as in its type template. A type read
-from a CSV file also has `.File`, the file, whose page is
-`entities/<Type>.html`:
+and each entity the same accessors as in its type template. A type with
+`pages: false` also has `.Page`, the link to its [type page](#type-pages),
+and is empty otherwise; a type read from a CSV file has `.File`, with the
+file's `.Path`:
 
 ```go-html-template
 <h1>{{.Component.Name}}</h1>
 {{range .Types}}
-<h2>{{.Type}}</h2>
+<h2>{{if .Page}}<a href="{{.Page}}">{{.Type}}</a>{{else}}{{.Type}}{{end}}</h2>
 <ul>
 {{- range .Entities}}
 <li>{{link .}} {{.Title}}</li>
@@ -177,6 +179,39 @@ from a CSV file also has `.File`, the file, whose page is
 When the export is [scoped]({{< relref "docs/concepts/exporting#scope" >}})
 to a document, the document is the main page instead, rendered through its
 type template.
+
+## Type pages
+
+A type whose schema says
+[`pages: false`]({{< relref "docs/concepts/schema#entities-without-pages" >}})
+has one page, `entities/<Type>.html`, instead of a page per entity.
+`templates/_<Type>.tmpl` renders it, inside the layout, and receives:
+
+| Accessor | Value |
+| --- | --- |
+| `.Type` | The type's name. |
+| `.Entities` | Its entities, in ID order, each with the same accessors as in its type template. |
+| `.File` | For a type read from a CSV file, the file's `.Path`; nil otherwise. |
+
+Every link to one of the entities points at `<Type>.html#<ID>`, so give
+each one an element with its ID as `id`:
+
+```go-html-template
+{{/* templates/_Definition.tmpl: a glossary */}}
+<h1>Glossary</h1>
+<dl>
+{{- range .Entities}}
+<dt id="{{.ID}}">{{.Title}}</dt>
+<dd>{{markdown .Body}}</dd>
+{{- end}}
+</dl>
+```
+
+Without a template, the built-in page is a table, one row per entity and a
+column per field, when none of the type's entities has a body; otherwise
+it shows each entity in turn as its type template renders it, one heading
+level down. A `_<Type>.tmpl` for a type whose entities have pages of their
+own is never used, and `provenance validate` warns of it.
 
 ## Stylesheet
 

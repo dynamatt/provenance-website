@@ -224,6 +224,34 @@ A record's fields follow the same rules as a list's inline `fields`. They
 may include links and lists, including lists of other records. A record may
 not contain itself, directly or through other records.
 
+## Entities without pages
+
+Each entity has its own page in the export, unless its type says
+`pages: false`. The type's entities are then shown together on one page,
+`entities/<Type>.html`, and every link to one of them points at its place
+there. Use it for a few small entities that read better together, such as
+severity levels or glossary terms, and for a large
+[CSV file]({{< relref "docs/concepts/importing-data" >}}) of near-identical
+rows.
+
+```yaml
+# schema/SeverityLevel.yaml
+type: SeverityLevel
+id_prefix: SEV
+pages: false
+fields:
+  - name: label
+    type: string
+  - name: score
+    type: number
+```
+
+A [`templates/_<Type>.tmpl`]({{< relref "docs/concepts/templates#type-pages" >}})
+lays the page out; without one, it is a table, or each entity in turn
+when they have bodies. Other types have no type page: to list a type,
+write a [Document]({{< relref "docs/concepts/documents" >}}) with a query
+block.
+
 ## Errors
 
 Provenance stops with exit code `2` and reports the file and line when the
@@ -232,6 +260,7 @@ schema cannot be read, for example when:
 - a field names an unknown type;
 - a name is declared twice;
 - a link has no `cardinality`;
+- `pages` is not `true` or `false`;
 - a list has neither `fields` nor `of`, or has both;
 - a record contains itself.
 
