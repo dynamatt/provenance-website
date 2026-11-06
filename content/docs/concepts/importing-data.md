@@ -46,6 +46,7 @@ source:
 fields:
   - name: title
     type: string
+    title: true
     column: Subject
   - name: received
     type: date
@@ -141,6 +142,7 @@ source:
 fields:
   - name: title
     type: string
+    title: true
     column: Summary
   - name: affects
     type: link

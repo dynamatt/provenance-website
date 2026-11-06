@@ -11,8 +11,9 @@ are yours to change or delete.
 provenance init my-device --code MYDEV --name "My Device"
 ```
 
-`--code` and `--name` fill `.component`, and both default to the folder's
-name. `init` writes nothing if any of its files is already in the folder,
+`--code` and `--name` fill `.component`. The code is required: 1 to 8
+upper-case letters and digits, used in component-qualified IDs. The name
+defaults to the folder's name, as written. `init` writes nothing if any of its files is already in the folder,
 or if the folder is already inside a Provenance repository. When the
 folder isn't in a git repository, it runs `git init` on branch `main`; it
 never commits, because the first commit is a record with your name on it.

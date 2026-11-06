@@ -35,11 +35,13 @@ A type template receives one entity as `.`. It reads a field, an incoming
 link or a list row's sub-field by its name in the schema: `verified_by` is
 `.verified_by`. The engine's own keys, below, are capitalised, so they never
 clash with a field: a type may declare `title`, `resolved` or `file` like
-any other field.
+any other field. An entity's title is not a key: it is the value of the
+field its type marks [`title: true`]({{< relref "docs/concepts/schema#entity-types" >}}),
+which the `title` function gives, `{{title .}}`.
 
 | Accessor | Value |
 | --- | --- |
-| `.ID`, `.Type`, `.Title` | The entity's ID, type name and title. |
+| `.ID`, `.Type` | The entity's ID and type name. |
 | `.Body` | The Markdown under the frontmatter, or the field declared `body: true`. |
 | `.<field>` | Every field the schema declares, set or not, by its name. Calculated fields hold their computed value. |
 | `.<facet>` | Every incoming link, by its `reverse_name`, such as `.implemented_by`: a list of the entities linking here. |
@@ -80,7 +82,7 @@ links without looking anything up:
 
 ```go-html-template
 {{range .implements}}
-<li>{{link .}}: {{.Title}}</li>
+<li>{{link .}}: {{title .}}</li>
 {{end}}
 ```
 
@@ -104,7 +106,7 @@ shortened:
 
 ```go-html-template
 <article class="requirement" id="{{.ID}}">
-<h1><span class="req-id">{{.ID}}</span> {{.Title}}</h1>
+<h1><span class="req-id">{{.ID}}</span> {{title .}}</h1>
 <p class="requirement-meta">
 <span class="status status-{{.status}}">{{.status}}</span>
 {{- with .parent_requirement}} · refines {{link .}}{{end}}
@@ -114,7 +116,7 @@ shortened:
 {{- if .verified_by}}
 <ul>
 {{- range .verified_by}}
-<li>{{link .}}: {{.Title}}</li>
+<li>{{link .}}: {{title .}}</li>
 {{- end}}
 </ul>
 {{- else}}
@@ -131,6 +133,7 @@ shortened:
 | `link .Entity` | A link to the entity's page showing its ID. Marked *unresolved* for a missing entity, and plain text for one outside the export's [scope]({{< relref "docs/concepts/exporting#scope" >}}). Nothing for an empty link. |
 | `link .Entity "text"` | The same link showing the text. Any value works, such as a number: `{{link . .TypeCitationIndex}}`. |
 | `href .Entity` | The relative URL of the entity's page, for a link of your own. Empty for an entity outside the scope, which has no page. |
+| `title .Entity` | The entity's title: the value of the field its type marks `title: true`. Nothing for a type without one. |
 | `short .SHA` | A commit hash shortened to seven characters. |
 
 The usual `html/template` functions, such as `index`, `len`, `eq` and
@@ -143,7 +146,7 @@ It receives:
 
 | Accessor | Value |
 | --- | --- |
-| `.Title` | The page title: the entity's ID and title, or the component's name on the main page. |
+| `.Title` | The page title: the entity's ID and title, or the component's name on the main page. This is the page's, not a field. |
 | `.Root` | The path from the page to the site's root, `""` or `"../"`. Prefix links to site files with it: `{{.Root}}style.css`. |
 | `.Component.Name`, `.Component.Code` | From the repository's `.component` file. |
 | `.Content` | The page's rendered content. `{{template "content" .}}` does the same. |
@@ -173,7 +176,7 @@ file's `.Path`:
 <h2>{{if .Page}}<a href="{{.Page}}">{{.Type}}</a>{{else}}{{.Type}}{{end}}</h2>
 <ul>
 {{- range .Entities}}
-<li>{{link .}} {{.Title}}</li>
+<li>{{link .}} {{title .}}</li>
 {{- end}}
 </ul>
 {{end}}
@@ -204,7 +207,7 @@ each one an element with its ID as `id`:
 <h1>Glossary</h1>
 <dl>
 {{- range .Entities}}
-<dt id="{{.ID}}">{{.Title}}</dt>
+<dt id="{{.ID}}">{{title .}}</dt>
 <dd>{{markdown .Body}}</dd>
 {{- end}}
 </dl>
@@ -245,7 +248,3 @@ stops the export with exit code `2` at its file, line and column. When the
 failure is inside a nested render, such as a field of an embedded entity,
 the error names the template where it started.
 
-Two fields or facets of one type whose accessors would be the same, such
-as a field and an incoming link both named `verified_by`, also stop the export, as does a field
-whose accessor is one Provenance provides, such as `citations` or `revisions`.
-`title` is the exception: a `title` field is the entity's `.Title`.

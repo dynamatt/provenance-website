@@ -29,6 +29,7 @@ id_prefix: DEF
 fields:
   - name: title
     type: string
+    title: true
     required: true
     help: "The term, written out in full."
   - name: abbreviation
@@ -45,7 +46,7 @@ fields:
     help: "The standard or paper the definition is taken from, if any."
 ```
 
-The term is the `title`, so a definition reads like any other entity: on
+The term is the field marked `title: true`, so a definition reads like any other entity: on
 the site's main page, in link tooltips and in query results. `source`
 links to a `Reference` entity, so a definition taken from a standard says
 which one. Leave `source` out if your schema has no Reference type.
@@ -83,7 +84,7 @@ Keep the branches you already have, such as the one numbering References:
 
 ```go-html-template
 {{- if eq .Type "Definition" -}}
-{{link . (or .CitationLabel .abbreviation .Title)}}
+{{link . (or .CitationLabel .abbreviation (title .))}}
 {{- else if .CitationLabel -}}
 {{link . .CitationLabel}}
 {{- else -}}
@@ -116,8 +117,8 @@ the Definitions among them before the rest of the document's end matter:
 <h2>Definitions</h2>
 <dl>
 {{- range .Citations}}{{if eq .Type "Definition"}}
-<dt id="def-{{.ID}}">{{.Title}}{{with .abbreviation}} ({{.}}){{end}}</dt>
-<dd>{{markdown .definition}}{{with .source}}<p class="definition-source">Source: {{.Title}} ({{link .}})</p>{{end}}</dd>
+<dt id="def-{{.ID}}">{{title .}}{{with .abbreviation}} ({{.}}){{end}}</dt>
+<dd>{{markdown .definition}}{{with .source}}<p class="definition-source">Source: {{title .}} ({{link .}})</p>{{end}}</dd>
 {{- end}}{{end}}
 </dl>
 </section>
