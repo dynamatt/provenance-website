@@ -17,6 +17,7 @@ wants to look different.
 | `templates/_cite.tmpl` | The plain ID of `[[ID]]` | Every inline citation. See [Citation style]({{< relref "docs/concepts/documents#citation-style" >}}). |
 | `templates/_layout.tmpl` | The built-in layout | The HTML around every page: head, header, footer, revision history. |
 | `templates/_index.tmpl` | The built-in main page | The site's `index.html`. |
+| `templates/_<Type>.tmpl` | The built-in type page | The page of a type with `pages: false`, `entities/<Type>.html`. See [Type pages](#type-pages). |
 | `templates/style.css` | The built-in stylesheet | Every page. |
 | `templates/reports/<name>.tmpl` | Nothing | A report of `provenance validate --output <name>`, not part of the site. See [Custom reports]({{< relref "docs/concepts/rules#custom-reports" >}}). |
 
@@ -30,41 +31,47 @@ path itself.
 
 ## Type templates
 
-A type template receives one entity as `.`. Its fields are named after the
-schema's fields in PascalCase: `verified_by` becomes `.VerifiedBy`.
+A type template receives one entity as `.`. It reads a field, an incoming
+link or a list row's sub-field by its name in the schema: `verified_by` is
+`.verified_by`. The engine's own keys, below, are capitalised, so they never
+clash with a field: a type may declare `title`, `resolved` or `file` like
+any other field. An entity's title is not a key: it is the value of the
+field its type marks [`title: true`]({{< relref "docs/concepts/schema#entity-types" >}}),
+which the `title` function gives, `{{title .}}`.
 
 | Accessor | Value |
 | --- | --- |
-| `.ID`, `.Type`, `.Title` | The entity's ID, type name and title. |
+| `.ID`, `.Type` | The entity's ID and type name. |
 | `.Body` | The Markdown under the frontmatter, or the field declared `body: true`. |
-| `.<Field>` | Every field the schema declares, set or not. Calculated fields hold their computed value. |
-| `.<Facet>` | Every incoming link, by its `reverse_name`, such as `.ImplementedBy`: a list of the entities linking here. |
+| `.<field>` | Every field the schema declares, set or not, by its name. Calculated fields hold their computed value. |
+| `.<facet>` | Every incoming link, by its `reverse_name`, such as `.implemented_by`: a list of the entities linking here. |
 | `.Resolved` | `true` for an entity that exists. See [links](#links). |
 | `.LastChangedSHA`, `.Revisions` | The page's [git stamps](#layout), also given to the layout. |
 | `.Citations` | What the page cites, on the entity the page is about. See [Reference lists]({{< relref "docs/concepts/documents#reference-lists" >}}). |
+| `.File` | The file the entity is written in: `.Path`, and `.Line`, where its ID is written. See [Importing data]({{< relref "docs/concepts/importing-data#in-templates" >}}). |
 
-A field the entity doesn't set is present and empty, so `{{with .Rationale}}`
-and `{{if .Rationale}}` work. A name the schema doesn't declare stops the
+A field the entity doesn't set is present and empty, so `{{with .rationale}}`
+and `{{if .rationale}}` work. A name the schema doesn't declare stops the
 export, so a misspelt field never renders as an empty gap:
 
 ```text
-export: templates/Requirement.tmpl:25:7: executing "templates/Requirement.tmpl" at <.Rationle>: map has no entry for key "Rationle"
+export: templates/Requirement.tmpl:25:7: executing "templates/Requirement.tmpl" at <.rationle>: map has no entry for key "rationle"
 ```
 
 To read a field that only some entities have, such as a status in a
 template shared by several types, use `index`, which gives nothing for a
-missing name: `{{with index . "Status"}}…{{end}}`.
+missing name: `{{with index . "status"}}…{{end}}`.
 
 ### Values
 
 | Field type | In a template |
 | --- | --- |
-| `string`, `text`, `date`, an enum | A string. Render `text` with `{{markdown .Statement}}`. |
+| `string`, `text`, `date`, an enum | A string. Render `text` with `{{markdown .statement}}`. |
 | `number` | A number. |
 | `boolean` | `true` or `false`. |
 | `link`, one target | The linked entity, with all its own accessors, or nothing. |
 | `link`, many targets | A list of linked entities. |
-| `list` of rows | A list of rows, each with its sub-fields in PascalCase. |
+| `list` of rows | A list of rows, each with its sub-fields by name. |
 | `list` with `of:` a type or enum | A list of plain values. |
 | `calculated` | The formula's result, or nothing when it is blank or can't be evaluated. |
 
@@ -74,8 +81,8 @@ A link field holds the linked entities themselves, so a template follows
 links without looking anything up:
 
 ```go-html-template
-{{range .Implements}}
-<li>{{link .}}: {{.Title}}</li>
+{{range .implements}}
+<li>{{link .}}: {{title .}}</li>
 {{end}}
 ```
 
@@ -99,17 +106,17 @@ shortened:
 
 ```go-html-template
 <article class="requirement" id="{{.ID}}">
-<h1><span class="req-id">{{.ID}}</span> {{.Title}}</h1>
+<h1><span class="req-id">{{.ID}}</span> {{title .}}</h1>
 <p class="requirement-meta">
-<span class="status status-{{.Status}}">{{.Status}}</span>
-{{- with .ParentRequirement}} · refines {{link .}}{{end}}
+<span class="status status-{{.status}}">{{.status}}</span>
+{{- with .parent_requirement}} · refines {{link .}}{{end}}
 </p>
-<div class="statement">{{markdown .Statement}}</div>
+<div class="statement">{{markdown .statement}}</div>
 <h2>Verified by</h2>
-{{- if .VerifiedBy}}
+{{- if .verified_by}}
 <ul>
-{{- range .VerifiedBy}}
-<li>{{link .}}: {{.Title}}</li>
+{{- range .verified_by}}
+<li>{{link .}}: {{title .}}</li>
 {{- end}}
 </ul>
 {{- else}}
@@ -126,6 +133,7 @@ shortened:
 | `link .Entity` | A link to the entity's page showing its ID. Marked *unresolved* for a missing entity, and plain text for one outside the export's [scope]({{< relref "docs/concepts/exporting#scope" >}}). Nothing for an empty link. |
 | `link .Entity "text"` | The same link showing the text. Any value works, such as a number: `{{link . .TypeCitationIndex}}`. |
 | `href .Entity` | The relative URL of the entity's page, for a link of your own. Empty for an entity outside the scope, which has no page. |
+| `title .Entity` | The entity's title: the value of the field its type marks `title: true`. Nothing for a type without one. |
 | `short .SHA` | A commit hash shortened to seven characters. |
 
 The usual `html/template` functions, such as `index`, `len`, `eq` and
@@ -138,7 +146,7 @@ It receives:
 
 | Accessor | Value |
 | --- | --- |
-| `.Title` | The page title: the entity's ID and title, or the component's name on the main page. |
+| `.Title` | The page title: the entity's ID and title, or the component's name on the main page. This is the page's, not a field. |
 | `.Root` | The path from the page to the site's root, `""` or `"../"`. Prefix links to site files with it: `{{.Root}}style.css`. |
 | `.Component.Name`, `.Component.Code` | From the repository's `.component` file. |
 | `.Content` | The page's rendered content. `{{template "content" .}}` does the same. |
@@ -157,15 +165,18 @@ this page shows" is described in
 `templates/_index.tmpl` is the content of `index.html`, inside the layout.
 It receives `.Component` and `.Types`: every entity grouped by type, types
 in name order and entities by ID. Each group has `.Type` and `.Entities`,
-and each entity the same accessors as in its type template:
+and each entity the same accessors as in its type template. A type with
+`pages: false` also has `.Page`, the link to its [type page](#type-pages),
+and is empty otherwise; a type read from a CSV file has `.File`, with the
+file's `.Path`:
 
 ```go-html-template
 <h1>{{.Component.Name}}</h1>
 {{range .Types}}
-<h2>{{.Type}}</h2>
+<h2>{{if .Page}}<a href="{{.Page}}">{{.Type}}</a>{{else}}{{.Type}}{{end}}</h2>
 <ul>
 {{- range .Entities}}
-<li>{{link .}} {{.Title}}</li>
+<li>{{link .}} {{title .}}</li>
 {{- end}}
 </ul>
 {{end}}
@@ -174,6 +185,39 @@ and each entity the same accessors as in its type template:
 When the export is [scoped]({{< relref "docs/concepts/exporting#scope" >}})
 to a document, the document is the main page instead, rendered through its
 type template.
+
+## Type pages
+
+A type whose schema says
+[`pages: false`]({{< relref "docs/concepts/schema#entities-without-pages" >}})
+has one page, `entities/<Type>.html`, instead of a page per entity.
+`templates/_<Type>.tmpl` renders it, inside the layout, and receives:
+
+| Accessor | Value |
+| --- | --- |
+| `.Type` | The type's name. |
+| `.Entities` | Its entities, in ID order, each with the same accessors as in its type template. |
+| `.File` | For a type read from a CSV file, the file's `.Path`; nil otherwise. |
+
+Every link to one of the entities points at `<Type>.html#<ID>`, so give
+each one an element with its ID as `id`:
+
+```go-html-template
+{{/* templates/_Definition.tmpl: a glossary */}}
+<h1>Glossary</h1>
+<dl>
+{{- range .Entities}}
+<dt id="{{.ID}}">{{title .}}</dt>
+<dd>{{markdown .Body}}</dd>
+{{- end}}
+</dl>
+```
+
+Without a template, the built-in page is a table, one row per entity and a
+column per field, when none of the type's entities has a body; otherwise
+it shows each entity in turn as its type template renders it, one heading
+level down. A `_<Type>.tmpl` for a type whose entities have pages of their
+own is never used, and `provenance validate` warns of it.
 
 ## Stylesheet
 
@@ -203,8 +247,3 @@ uses. A template that can't be parsed, or that fails while rendering,
 stops the export with exit code `2` at its file, line and column. When the
 failure is inside a nested render, such as a field of an embedded entity,
 the error names the template where it started.
-
-Two fields or facets of one type whose accessors would be the same, such
-as a field and an incoming link both named `verified_by`, also stop the export, as does a field
-whose accessor is one Provenance provides, such as `citations` or `revisions`.
-`title` is the exception: a `title` field is the entity's `.Title`.
