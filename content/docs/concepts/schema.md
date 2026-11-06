@@ -47,8 +47,10 @@ A type can instead read its entities from a CSV file, one per row, by
 declaring a `source:`; its fields are declared the same way. See
 [Importing data]({{< relref "docs/concepts/importing-data" >}}).
 
-Every field has a `name` and a `type`. Field names are `snake_case`, and
-must be unique within a type. `code_blocks` is taken: it is the list of
+Every field has a `name` and a `type`. Field names are lower-case
+`snake_case`, a letter then letters, digits and single underscores, such as
+`verified_by`, and must be unique within a type. A template reads a field by
+this name, `.verified_by`. `code_blocks` is taken: it is the list of
 fenced blocks every entity has for
 [conditions]({{< relref "docs/concepts/documents#what-a-condition-can-read" >}}),
 so neither a field nor a `reverse_name` can use it. The other field keys
@@ -260,6 +262,8 @@ schema cannot be read, for example when:
 - a field names an unknown type;
 - a name is declared twice;
 - a link has no `cardinality`;
+- a field's `name`, or a link's `reverse_name`, is not lower-case
+  `snake_case`;
 - `pages` is not `true` or `false`;
 - a list has neither `fields` nor `of`, or has both;
 - a record contains itself.

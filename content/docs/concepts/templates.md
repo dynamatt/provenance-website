@@ -31,42 +31,45 @@ path itself.
 
 ## Type templates
 
-A type template receives one entity as `.`. Its fields are named after the
-schema's fields in PascalCase: `verified_by` becomes `.VerifiedBy`.
+A type template receives one entity as `.`. It reads a field, an incoming
+link or a list row's sub-field by its name in the schema: `verified_by` is
+`.verified_by`. The engine's own keys, below, are capitalised, so they never
+clash with a field: a type may declare `title`, `resolved` or `file` like
+any other field.
 
 | Accessor | Value |
 | --- | --- |
 | `.ID`, `.Type`, `.Title` | The entity's ID, type name and title. |
 | `.Body` | The Markdown under the frontmatter, or the field declared `body: true`. |
-| `.<Field>` | Every field the schema declares, set or not. Calculated fields hold their computed value. |
-| `.<Facet>` | Every incoming link, by its `reverse_name`, such as `.ImplementedBy`: a list of the entities linking here. |
+| `.<field>` | Every field the schema declares, set or not, by its name. Calculated fields hold their computed value. |
+| `.<facet>` | Every incoming link, by its `reverse_name`, such as `.implemented_by`: a list of the entities linking here. |
 | `.Resolved` | `true` for an entity that exists. See [links](#links). |
 | `.LastChangedSHA`, `.Revisions` | The page's [git stamps](#layout), also given to the layout. |
 | `.Citations` | What the page cites, on the entity the page is about. See [Reference lists]({{< relref "docs/concepts/documents#reference-lists" >}}). |
 | `.File` | The file the entity is written in: `.Path`, and `.Line`, where its ID is written. See [Importing data]({{< relref "docs/concepts/importing-data#in-templates" >}}). |
 
-A field the entity doesn't set is present and empty, so `{{with .Rationale}}`
-and `{{if .Rationale}}` work. A name the schema doesn't declare stops the
+A field the entity doesn't set is present and empty, so `{{with .rationale}}`
+and `{{if .rationale}}` work. A name the schema doesn't declare stops the
 export, so a misspelt field never renders as an empty gap:
 
 ```text
-export: templates/Requirement.tmpl:25:7: executing "templates/Requirement.tmpl" at <.Rationle>: map has no entry for key "Rationle"
+export: templates/Requirement.tmpl:25:7: executing "templates/Requirement.tmpl" at <.rationle>: map has no entry for key "rationle"
 ```
 
 To read a field that only some entities have, such as a status in a
 template shared by several types, use `index`, which gives nothing for a
-missing name: `{{with index . "Status"}}…{{end}}`.
+missing name: `{{with index . "status"}}…{{end}}`.
 
 ### Values
 
 | Field type | In a template |
 | --- | --- |
-| `string`, `text`, `date`, an enum | A string. Render `text` with `{{markdown .Statement}}`. |
+| `string`, `text`, `date`, an enum | A string. Render `text` with `{{markdown .statement}}`. |
 | `number` | A number. |
 | `boolean` | `true` or `false`. |
 | `link`, one target | The linked entity, with all its own accessors, or nothing. |
 | `link`, many targets | A list of linked entities. |
-| `list` of rows | A list of rows, each with its sub-fields in PascalCase. |
+| `list` of rows | A list of rows, each with its sub-fields by name. |
 | `list` with `of:` a type or enum | A list of plain values. |
 | `calculated` | The formula's result, or nothing when it is blank or can't be evaluated. |
 
@@ -76,7 +79,7 @@ A link field holds the linked entities themselves, so a template follows
 links without looking anything up:
 
 ```go-html-template
-{{range .Implements}}
+{{range .implements}}
 <li>{{link .}}: {{.Title}}</li>
 {{end}}
 ```
@@ -103,14 +106,14 @@ shortened:
 <article class="requirement" id="{{.ID}}">
 <h1><span class="req-id">{{.ID}}</span> {{.Title}}</h1>
 <p class="requirement-meta">
-<span class="status status-{{.Status}}">{{.Status}}</span>
-{{- with .ParentRequirement}} · refines {{link .}}{{end}}
+<span class="status status-{{.status}}">{{.status}}</span>
+{{- with .parent_requirement}} · refines {{link .}}{{end}}
 </p>
-<div class="statement">{{markdown .Statement}}</div>
+<div class="statement">{{markdown .statement}}</div>
 <h2>Verified by</h2>
-{{- if .VerifiedBy}}
+{{- if .verified_by}}
 <ul>
-{{- range .VerifiedBy}}
+{{- range .verified_by}}
 <li>{{link .}}: {{.Title}}</li>
 {{- end}}
 </ul>

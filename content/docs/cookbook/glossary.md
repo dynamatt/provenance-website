@@ -83,7 +83,7 @@ Keep the branches you already have, such as the one numbering References:
 
 ```go-html-template
 {{- if eq .Type "Definition" -}}
-{{link . (or .CitationLabel .Abbreviation .Title)}}
+{{link . (or .CitationLabel .abbreviation .Title)}}
 {{- else if .CitationLabel -}}
 {{link . .CitationLabel}}
 {{- else -}}
@@ -116,8 +116,8 @@ the Definitions among them before the rest of the document's end matter:
 <h2>Definitions</h2>
 <dl>
 {{- range .Citations}}{{if eq .Type "Definition"}}
-<dt id="def-{{.ID}}">{{.Title}}{{with .Abbreviation}} ({{.}}){{end}}</dt>
-<dd>{{markdown .Definition}}{{with .Source}}<p class="definition-source">Source: {{.Title}} ({{link .}})</p>{{end}}</dd>
+<dt id="def-{{.ID}}">{{.Title}}{{with .abbreviation}} ({{.}}){{end}}</dt>
+<dd>{{markdown .definition}}{{with .source}}<p class="definition-source">Source: {{.Title}} ({{link .}})</p>{{end}}</dd>
 {{- end}}{{end}}
 </dl>
 </section>

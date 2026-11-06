@@ -148,7 +148,7 @@ fields:
     cardinality: many
     reverse_name: anomalies
     column: Requirements
-  - name: fixed
+  - name: resolved
     type: boolean
     column: Resolved
 ```
@@ -161,10 +161,6 @@ BUG-1042,Alarm tone clipped at maximum volume,REQ-0001;REQ-0003,false
 Each requirement then has its `anomalies`, and a rule can stop a release
 while a requirement has one that isn't fixed. A link to an ID that doesn't
 exist is reported at the row's line, as it would be in an entity file.
-
-A field can't be named `resolved`, `file` or another name the
-[template data]({{< relref "docs/concepts/templates#type-templates" >}})
-already uses; map the column to another name with `column:`.
 
 ## IDs
 
