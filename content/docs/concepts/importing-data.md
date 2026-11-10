@@ -1,17 +1,14 @@
 ---
 title: "Importing data"
 description: "Load entities from a CSV file: dumps from another system, such as complaints or an issue tracker's anomalies, and tables your team keeps by hand."
-# Planned for v0.5.0-alpha (Epic 6 in PLAN.md). Published at the epic's
-# close-out, once checked against what was built.
-draft: true
 ---
 
 Some records are kept in another system, such as the complaint-handling
 process, an issue tracker or a test runner. Others are tables by nature.
 Provenance can load these records straight from a CSV file in the
 repository. Each row becomes an entity like any Markdown one: it has an
-ID, links and is linked to, is selected by queries and rules, has a page
-in the export, and counts in the content hash.
+ID, links and is linked to, is cited, is selected by queries and rules,
+has a page in the export, and counts in the content hash.
 
 ## What teams import
 
@@ -35,25 +32,26 @@ requirement it affects.
 
 ## Declaring a CSV-backed type
 
-A type is backed by a file when its schema has a `source:`. Its fields are
-declared as for any type; `column:` names the header when it differs from
-the field's name.
+A type is read from a file when its schema has a `source:`. Its fields
+are declared as for any type; `column:` names the header when it differs
+from the field's name.
 
 ```yaml
 # schema/Complaint.yaml
 type: Complaint
-id_prefix: CMP
+id_prefix: CPL
 source:
-  csv: data/complaints.csv             # the file, from the repository root
-  system: Complaint handling (QMS-CH)  # where every dump comes from
-  id: complaint_no                     # the column holding each row's ID
+  csv: data/complaints.csv   # the file, from the repository root
+  id: complaint_no           # the column holding each row's ID
 fields:
+  - name: title
+    type: string
+    title: true
+    column: Subject
   - name: received
     type: date
     column: Date Received
   - name: product
-    type: string
-  - name: failure_mode
     type: string
   - name: harm_occurred
     type: boolean
@@ -62,8 +60,8 @@ fields:
 ```
 
 ```text
-complaint_no,Date Received,product,failure_mode,harm_occurred,summary
-CMP-2026-0141,2026-08-14,Lead kit,"Lead fracture, distal",false,Signal lost after a fall.
+complaint_no,Date Received,Subject,product,harm_occurred,summary
+CPL-2026-0141,2026-08-14,Signal loss when bending,"NP-100 lead kit, long",false,Lead fracture at the junction.
 ```
 
 A Risk then links to its complaints, and a calculated field counts them:
@@ -75,49 +73,57 @@ A Risk then links to its complaints, and a calculated field counts them:
     target: [Complaint]
     cardinality: many
     reverse_name: cited_by_risks
+  - name: complaint_count
+    type: calculated
+    formula: "COUNT(complaints)"
 ```
 
 The source's keys:
 
 | Key | Meaning |
 | --- | --- |
-| `csv` | The file, as a path from the repository root. |
-| `system` | The system the file is exported from. Leave it out for a [table kept by hand](#tables-kept-by-hand). |
-| `id` | The column holding each row's ID. |
+| `csv` | The file, as a path from the repository root. Required. |
+| `id` | The column holding each row's ID. Required. |
 | `delimiter` | The character between cells. Default `,`. |
-| `separator` | The character between the IDs or items in one cell. Default `;`. |
-| `pages` | `false` for no page per row, for a large file. Default `true`. |
+| `separator` | What separates the IDs or items in one cell. Default `;`. |
 
 The file is RFC 4180 CSV in UTF-8 with a header row, which is what
-spreadsheets and most systems export. A column the schema doesn't name is
-ignored, and `validate` warns of it, so a column renamed in the source
-system is noticed.
+spreadsheets and most systems export; a byte-order mark and CRLF line
+endings are fine. A cell holding the delimiter, a quote or a line break is
+quoted, with each quote doubled.
+
+A type's fields can't include a list of rows, which has no form in one
+cell, or a `body: true` field: a row has no Markdown body. A calculated
+field is computed as on any entity, and never read from a column.
 
 ## How a cell is read
 
 A cell takes the same field types, written the same way, as a value in an
 entity file. There are no CSV-only types: a value is valid in a cell
-exactly when it is valid in a file, so a rule, query or template reads a
-row's fields as it reads any entity's.
+exactly when it is valid in a file, and means the same, so a rule, query
+or template reads a row's fields as it reads any entity's.
 
 | Field type | In a cell |
 | --- | --- |
-| `string` | One line of text. |
-| `text` | Markdown, wikilinks included. |
-| `number` | `2.5`, `-3`, `1000`. No thousands separators, units or `%`. |
+| `string` | Text. |
+| `text` | Markdown, wikilinks and embeds included. |
+| `number` | `2.5`, `-3`, `1000`, `1e3`. No thousands separators, units or `%`. |
 | `date` | `YYYY-MM-DD`. |
 | `boolean` | `true` or `false`. |
 | *an enum* | One of its values. |
 | `link`, `cardinality: one` | One ID. |
 | `link`, `cardinality: many` | IDs separated by the source's `separator`, such as `REQ-0012;REQ-0031`. |
 | `list` of a built-in type or an enum | Items separated by the source's `separator`. |
-| `list` of rows | Not available: a row's fields are its columns. |
 | `calculated` | Never a column; computed as on any entity. |
 
-An empty cell is a field with no value, the same as a field an entity file
-leaves out, so `required: true` works the same way. A system that writes
-dates another way, such as `14/08/2026`, needs to be set to export ISO
-dates, or its file converted before it is committed.
+Spaces around each ID or item are ignored, and an empty one, such as
+after a trailing `;`, is left out. An empty cell is a field with no value,
+the same as a field an entity file leaves out, so `required: true` works
+the same way.
+
+A system that writes dates another way, such as `14/08/2026`, or numbers
+with a thousands separator, needs to be set to export ISO dates and plain
+numbers, or its file converted before it is committed.
 
 ## Rows that link out
 
@@ -129,13 +135,14 @@ affects:
 # schema/Anomaly.yaml
 type: Anomaly
 id_prefix: BUG
+pages: false            # shown together on one page, below
 source:
   csv: data/anomalies.csv
-  system: Issue tracker (Jira)
   id: Key
 fields:
   - name: title
     type: string
+    title: true
     column: Summary
   - name: affects
     type: link
@@ -145,49 +152,102 @@ fields:
     column: Requirements
   - name: resolved
     type: boolean
+    column: Resolved
 ```
 
 ```text
 Key,Summary,Requirements,Resolved
-BUG-1042,Alarm tone clipped at max volume,REQ-0012;REQ-0031,false
+BUG-1042,Alarm tone clipped at maximum volume,REQ-0001;REQ-0003,false
 ```
 
-Each requirement then lists its `anomalies`, and a rule can stop a release
-while a requirement has an unresolved one. A link to an ID that doesn't
+Each requirement then has its `anomalies`, and a rule can stop a release
+while a requirement has one that isn't fixed. A link to an ID that doesn't
 exist is reported at the row's line, as it would be in an entity file.
 
-## Dumps and their sidecar
+## IDs
 
-A copied file doesn't say when it was exported, so a type with a `system:`
-needs a sidecar beside each dump that does:
+A row keeps the ID written in its ID column, so a record can be traced
+back to the system that gave it: each must start with the type's
+`id_prefix` and a hyphen, such as `CPL-2026-0141` or `STD-0001`. Every ID
+is unique across the repository, rows and files alike.
 
-```yaml
-# data/complaints.csv.yaml, rewritten with each dump
-exported: 2026-09-30
-sha256: 3b5c7e…    # sha256sum data/complaints.csv
+## Where a dump came from
+
+Git dates every row. To bring in a new dump, replace the file and commit
+it: the commit records when the copy entered the design history file and
+who brought it in. Each row's page shows when that row last changed, and
+its revision history lists every commit that changed it, so a new dump
+moves only the rows it changed.
+
+```bash
+cp ~/Downloads/complaints-2026-10-31.csv data/complaints.csv
+git commit -am "Complaints dump of 2026-10-31"
 ```
 
-`validate` fails when the sidecar is missing, or when its hash isn't the
-file's, so a new dump can't be merged without saying when it was exported.
-Git records when the copy entered the design history file and who
-committed it. Each row's page shows all of it.
-
-To bring in a new dump, replace the file, rewrite the sidecar and commit
-both. A row's history moves only when that row changed, so a monthly dump
-doesn't make every complaint look edited.
+If you also want to record the date a dump was exported, or the system
+it came from, declare a field for it, such as a `date` column, like any
+other. A per-row export date changes every row on each dump, though, so
+every row's history moves with it.
 
 ## Tables kept by hand
 
-A type whose `source:` has no `system:` is a table your team keeps in the
-repository, such as a standards register. It needs no sidecar, and its IDs
-take the `<id_prefix>-NNNN` form of any entity you write (`STD-0001`),
-where a dump's IDs are the source system's, used as written. Edit it in a
-spreadsheet or a text editor; its pull request's diff shows the rows that
-changed.
+A table your team keeps in the repository, such as a standards register,
+is read the same way. Edit it in a spreadsheet or a text editor; its pull
+request's diff shows the rows that changed.
+
+## Pages
+
+Each row has its own page, `entities/<ID>.html`, which says which file it
+is a row of. For a large file, or a few small rows that read better
+together, give the type
+[`pages: false`]({{< relref "docs/concepts/schema#entities-without-pages" >}}),
+as any type may: its rows then have no pages of their own, and are shown
+together on the [type page]({{< relref "docs/concepts/templates#type-pages" >}}),
+`entities/<Type>.html`, where every link or citation of a row points. A
+CSV file has no page of its own otherwise; to list its rows, write a
+Document with a query block.
+
+## In templates
+
+A row is an entity, so a template reads it as any other: its fields, its
+`.Type`, its `.LastChangedSHA` and `.Revisions`. Every entity also has
+`.File`, the file it is written in, with the same keys for a Markdown
+file and a CSV row:
+
+| Accessor | Markdown entity | CSV row |
+| --- | --- | --- |
+| `.File.Path` | `REQ/REQ-0001.md` | `data/complaints.csv` |
+| `.File.Line` | The line of its `id:` | The row's line |
+
+```go-html-template
+<p>{{.File.Path}}:{{.File.Line}}</p>
+```
+
+`link` and `href` point a row without a page of its own at its place on
+the type page. On the
+[main page]({{< relref "docs/concepts/templates#main-page" >}}), each type
+group read from a file has the file's `.File`, its `.Path` alone.
+
+## History
+
+A row changes when one of the cells its fields read changes, so a dump
+that reorders columns or adds one changes no row. A new dump moves the
+*last changed* commit of the rows it changed, not every row's.
+
+## What validate reports
+
+| Check | Severity | Reports |
+| --- | --- | --- |
+| `content/csv-row` | error | A missing or unreadable file, a header naming a column twice or without the ID column, a row with the wrong number of cells or no ID, a quote out of place. |
+| `content/csv-column` | warning | A column no field reads, and a field whose column is missing, so a column renamed in the source system is noticed. |
+
+A cell's value, enum, link or ID is checked by the same check as in an
+entity file, at the row's line: `schema/invalid-value`,
+`schema/enum-value`, `links/unresolved`, `schema/id-format`.
 
 ## What Provenance doesn't do with rows
 
-The CSV file is a copy of another record, so Provenance's commands never
-write it: `fmt`, `rename`, the editor and `sign` leave it as it is. A row
-has no Markdown body. Formats that need code, such as an eQMS's API or an
-XLSX workbook, are for import plugins.
+The CSV file is a copy of another record, or a table you edit yourself,
+so Provenance's commands never write it: `fmt` leaves it as it is.
+Formats that need code, such as an eQMS's API or an XLSX workbook, are
+for import plugins.

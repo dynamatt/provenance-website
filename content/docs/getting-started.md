@@ -65,7 +65,7 @@ what proves a download is the published binary, so check it first, then:
 `init` writes a medical-device starter into a new folder:
 
 ```bash
-provenance init my-device
+provenance init my-device --code MYDEV
 cd my-device
 provenance validate
 ```

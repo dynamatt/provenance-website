@@ -57,7 +57,7 @@ end of every document, add them to `templates/Document.tmpl`:
 <h2>References</h2>
 <ol>
 {{- range .}}
-<li>{{link .}}: {{.Title}}</li>
+<li>{{link .}}: {{title .}}</li>
 {{- end}}
 </ol>
 {{- end}}
@@ -76,7 +76,7 @@ list them separately and number them:
 
 ```go-html-template
 {{range .Citations}}{{if eq .Type "Reference"}}
-<li id="ref-{{.TypeCitationIndex}}">{{.Title}}</li>
+<li id="ref-{{.TypeCitationIndex}}">{{title .}}</li>
 {{end}}{{end}}
 ```
 
@@ -112,9 +112,9 @@ isn't part of the citation. `[[ID#field]]` and `[[#caption]]` keep their
 usual rendering. On the site's main page, which isn't about one entity,
 citations always render as they would without the template.
 
-`.CitationLabel`, `.CitationIndex` and `.TypeCitationIndex` are reserved:
-a schema can't declare fields named `citation_label`, `citation_index` or
-`type_citation_index`.
+`.CitationLabel`, `.CitationIndex` and `.TypeCitationIndex` are the
+engine's keys, capitalised; fields named `citation_label` and the like are
+read as `.citation_label`, so the two never clash.
 
 ## Query blocks
 

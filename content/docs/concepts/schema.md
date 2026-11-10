@@ -33,6 +33,7 @@ id_prefix: REQ
 fields:
   - name: title
     type: string
+    title: true
     required: true
   - name: statement
     type: text
@@ -43,8 +44,14 @@ fields:
     required: true
 ```
 
-Every field has a `name` and a `type`. Field names are `snake_case`, and
-must be unique within a type. `code_blocks` is taken: it is the list of
+A type can instead read its entities from a CSV file, one per row, by
+declaring a `source:`; its fields are declared the same way. See
+[Importing data]({{< relref "docs/concepts/importing-data" >}}).
+
+Every field has a `name` and a `type`. Field names are lower-case
+`snake_case`, a letter then letters, digits and single underscores, such as
+`verified_by`, and must be unique within a type. A template reads a field by
+this name, `.verified_by`. `code_blocks` is taken: it is the list of
 fenced blocks every entity has for
 [conditions]({{< relref "docs/concepts/documents#what-a-condition-can-read" >}}),
 so neither a field nor a `reverse_name` can use it. The other field keys
@@ -54,6 +61,8 @@ are:
 | --- | --- | --- |
 | `required` | any field | The field must be set. |
 | `help` | any field | Guidance shown to authors. |
+| `friendly_name` | any field | How the built-in pages label the field, such as `Verified by`. Without one, they show its name as written: `verified_by`. |
+| `title` | `string` | `true` makes the field the entity's title: shown beside its ID on its page, in link tooltips and on the main page, and given to templates by `{{title .}}`. At most one top-level field per type; a type without one has entities without titles. No field is a title by its name. |
 | `body` | `text` | Stores this field as the Markdown body below the frontmatter. At most one top-level `text` field per type may set it; a type without one has a freeform body. |
 | `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
 | `cardinality` | `link` | `one` (a single ID) or `many` (a list of IDs). Required. |
@@ -61,6 +70,7 @@ are:
 | `formula` | `calculated` | The expression the value is computed from. See [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | `fields` | `list` | The list's row fields, declared inline. |
 | `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
+| `column` | any field of a type with a `source` | The CSV header the field reads, when it isn't the field's name. |
 
 There are no default values. What an entity's file says is its whole
 value: a field the file leaves out is empty everywhere it is read, so a
@@ -219,6 +229,34 @@ A record's fields follow the same rules as a list's inline `fields`. They
 may include links and lists, including lists of other records. A record may
 not contain itself, directly or through other records.
 
+## Entities without pages
+
+Each entity has its own page in the export, unless its type says
+`pages: false`. The type's entities are then shown together on one page,
+`entities/<Type>.html`, and every link to one of them points at its place
+there. Use it for a few small entities that read better together, such as
+severity levels or glossary terms, and for a large
+[CSV file]({{< relref "docs/concepts/importing-data" >}}) of near-identical
+rows.
+
+```yaml
+# schema/SeverityLevel.yaml
+type: SeverityLevel
+id_prefix: SEV
+pages: false
+fields:
+  - name: label
+    type: string
+  - name: score
+    type: number
+```
+
+A [`templates/_<Type>.tmpl`]({{< relref "docs/concepts/templates#type-pages" >}})
+lays the page out; without one, it is a table, or each entity in turn
+when they have bodies. Other types have no type page: to list a type,
+write a [Document]({{< relref "docs/concepts/documents" >}}) with a query
+block.
+
 ## Errors
 
 Provenance stops with exit code `2` and reports the file and line when the
@@ -227,6 +265,11 @@ schema cannot be read, for example when:
 - a field names an unknown type;
 - a name is declared twice;
 - a link has no `cardinality`;
+- a field's `name`, or a link's `reverse_name`, is not lower-case
+  `snake_case`;
+- `pages` is not `true` or `false`;
+- `title: true` is on a field that isn't a top-level `string`, or on two
+  fields of one type;
 - a list has neither `fields` nor `of`, or has both;
 - a record contains itself.
 
