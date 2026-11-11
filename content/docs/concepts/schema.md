@@ -67,6 +67,7 @@ are:
 | `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
 | `cardinality` | `link` | `one` (a single ID) or `many` (a list of IDs). Required. |
 | `reverse_name` | `link` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
+| `reverse_friendly_name` | `link` with `reverse_name` | How the built-in pages label the `reverse_name` on the target's page, such as `Verified by`. Without one, they show the `reverse_name` as written. Links that share a `reverse_name` give it one label. |
 | `formula` | `calculated` | The expression the value is computed from. See [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | `fields` | `list` | The list's row fields, declared inline. |
 | `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
@@ -121,10 +122,11 @@ names the link as seen from the requirement:
     target: [Requirement]
     cardinality: many
     reverse_name: verified_by
+    reverse_friendly_name: Verified by
 ```
 
 The requirement then has a derived `verified_by` relationship, listing
-every protocol that verifies it. A `reverse_name` must not repeat a field
+every protocol that verifies it, labelled `Verified by` on its page. A `reverse_name` must not repeat a field
 declared on the target type, because the relationship would then be stored
 twice.
 
