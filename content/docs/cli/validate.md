@@ -38,7 +38,7 @@ the gate.
 
 | ID | Severity | Reports |
 | --- | --- | --- |
-| `content/caption` | error | A caption that cannot be placed or referred to |
+| `content/caption` | error | A caption that cannot be placed |
 | `content/csv-column` | warning | A CSV column no field reads, or a field with no column |
 | `content/csv-row` | error | A CSV file or row that cannot be read |
 | `content/duplicate-id` | error | Two files with one ID |
@@ -48,13 +48,14 @@ the gate.
 | `content/frontmatter` | error | Frontmatter that cannot be read |
 | `content/image` | error | An image the website cannot publish |
 | `content/query` | error | A query block that cannot run |
+| `content/tag` | error | A tag that cannot be referred to |
 | `content/template` | error | A template that cannot render |
 | `content/template-name` | warning | A template named for nothing |
 | `content/unknown-override` | warning | An underscore template that overrides nothing |
 | `content/unrendered-block` | error | A block this version publishes only as source |
 | `content/unused-template` | warning | A named template no query chooses |
+| `links/reference` | error | A reference to a field, tag or caption the target does not have |
 | `links/target-type` | error | A link to an entity of the wrong type |
-| `links/unknown-field` | error | A field reference to a field the target does not have |
 | `links/unresolved` | error | A link to no entity |
 | `rules/file` | error | A rule file that is not a YAML mapping |
 | `rules/message` | error | A rule without a message |
