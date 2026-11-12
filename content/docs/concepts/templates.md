@@ -95,7 +95,8 @@ resolved links renders it without special cases, and `link` marks it
 
 Write headings relative to the entity: `<h1>` is its title, `<h2>` its
 sections. Provenance shifts every heading to the depth the entity is shown
-at, keeping its `id` and `class`. On the entity's own page the `<h1>` stays
+at, keeping its `id` and `class`, and numbers it
+([Styling the export]({{< relref "docs/concepts/styling#headings-and-section-numbers" >}})). On the entity's own page the `<h1>` stays
 an `<h1>`. Embedded under a document's `<h2>` section, it becomes an `<h3>`.
 
 ### An example
@@ -155,6 +156,17 @@ It receives:
 | `.LastChangedSHA` | The last commit that changed what this page shows, ending in `-dirty` when some of it is uncommitted. |
 | `.Revisions` | Every commit that changed what this page shows, newest first, each with `.SHA`, `.Short`, `.Date`, `.Author`, `.Subject` and `.Tags`. |
 | `.Citations` | What the page cites, as a type template receives it. Empty on the main page. |
+| `.Page` | What kind of page it is: `entity`, `index` or `type`. |
+| `.Type` | The type the page is about: the entity's, a type page's, or a scoped main page's document's. Empty on the unscoped main page. |
+| `.Entity` | The ID of the entity the page is about. Empty on the unscoped main page and type pages. |
+
+Write `.Page`, `.Type` and `.Entity` on `<body>`, as the built-in layout
+does, so the stylesheet can style one type's pages
+([Styling the export]({{< relref "docs/concepts/styling#which-type-which-page" >}})):
+
+```go-html-template
+<body data-page="{{.Page}}"{{with .Type}} data-type="{{.}}"{{end}}{{with .Entity}} data-entity="{{.}}"{{end}}>
+```
 
 The git stamps are empty outside a git repository. What counts as "what
 this page shows" is described in
@@ -223,18 +235,9 @@ own is never used, and `provenance validate` warns of it.
 
 `templates/style.css` replaces the built-in stylesheet entirely, and is
 written to the site as `style.css`. Start from a copy of the built-in one,
-`style.css` in any exported site. The HTML Provenance generates itself uses
-these classes:
-
-| Class | On |
-| --- | --- |
-| `ref` | A link made by `link` or a wikilink. |
-| `out-of-scope` | A reference to an entity outside the export's scope, which is plain text. |
-| `unresolved` | A reference to an ID no entity has. |
-| `query` | A query block's results: a `<ul>` for `render: id` and `render: field:`, a `<div>` for `render: full`. |
-| `query-empty` | A query block's *No … matches this query.* |
-| `embed` | The `<section>` holding an embedded entity. |
-| `captioned-figure`, `captioned-table`, `captioned-equation` | A captioned figure, table or equation, and its caption. |
+`style.css` in any exported site. Every class and attribute the export
+writes, and recipes such as hiding one type's section numbers, are in
+[Styling the export]({{< relref "docs/concepts/styling" >}}).
 
 The stylesheet isn't part of what a page shows for its
 *last changed* stamp: restyling the site doesn't change any page's

@@ -80,8 +80,12 @@ Whether it is shown is up to the stylesheet, per type if you like; a
 reference shows the number either way:
 
 ```css
-article.requirement .section-number { display: none; }
+body[data-type="Requirement"] main .section-number,
+.embed[data-type="Requirement"] .section-number { display: none; }
 ```
+
+[Styling the export]({{< relref "docs/concepts/styling#remove-section-numbers-from-requirements-only" >}})
+explains these selectors.
 
 ### What a reference shows
 
