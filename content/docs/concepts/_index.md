@@ -16,5 +16,6 @@ Read about [entities and links]({{< relref "docs/concepts/entities-and-links" >}
 [formatting]({{< relref "docs/concepts/formatting" >}}),
 [starter templates]({{< relref "docs/concepts/starter-templates" >}}),
 [exporting the DHF]({{< relref "docs/concepts/exporting" >}}),
-[templates]({{< relref "docs/concepts/templates" >}}) and the
+[templates]({{< relref "docs/concepts/templates" >}}),
+[styling the export]({{< relref "docs/concepts/styling" >}}) and the
 role of [Git in the audit trail]({{< relref "docs/concepts/git-and-audit-trail" >}}).

@@ -23,17 +23,91 @@ Wikilinks work in any Markdown: an entity's body and its `text` fields.
 | `[[REQ-0001\|the amplitude rule]]` | The same link with your own text. |
 | `[[REQ-0002#title]]` | The field's current value, linked to the entity. |
 | `![[REQ-0003]]` | The whole entity, rendered through its type's template. It must stand alone in its paragraph. |
-| `[[#control-loop]]` | The number of a caption in this document, such as *Figure 1*, linked to it. |
+| `[[#control-loop]]` | The number of a caption or tagged section in this entity, such as *Figure 1* or *Section 3.2*, linked to it. See [Section and item references](#section-and-item-references). |
+| `[[VER-0001#preparation]]` | The number of another entity's caption or tagged section, such as *Section 1 of VER-0001*. |
 
 An ID that no entity has is shown marked *unresolved*; the export still
 succeeds, but `provenance validate` reports it as an error at its line, as
-it does an `[[ID#field]]` naming a field the entity's type doesn't have, a
-`[[#id]]` with no caption of that id on the page, and an `![[ID]]` written
+it does an `[[ID#name]]` naming no field, tag or caption of the entity, a
+`[[#tag]]` naming none of its own entity's, and an `![[ID]]` written
 inside running text, which is shown as a reference rather than embedded.
 Captions and references to them are described in
 [Images and captions]({{< relref "docs/concepts/exporting#captions" >}}).
 An entity that embeds itself, directly or through other embeds,
 stops the export, because the document would never end.
+
+## Section and item references
+
+A heading or a numbered list item can be tagged, and a reference to the
+tag shows the number it has where the reference is rendered: "see
+Section 3.2", "step 4 of VER-0001". Tag it with `{#tag}` at the end of the
+heading's line, or of the item's first paragraph:
+
+```markdown
+## Preparation {#preparation}
+
+1. Fill the saline tank to its mark. {#fill-tank}
+2. Warm up the bench equipment for 30 minutes.
+   1. Power on the ECAP simulator.
+   2. Zero the current probe with the lead disconnected. {#zero-probe}
+
+Begin only once [[#preparation]] is complete; the probe zeroed in
+[[#zero-probe]] must not be re-clipped.
+```
+
+renders, on the entity's own page, as "Begin only once Section 1 is
+complete; the probe zeroed in item 2(b) must not be re-clipped."
+
+A tag is lower-case letters, digits and `-`, unique within its entity, and
+shares one namespace with the entity's caption ids, so `[[#x]]` never has to
+say which it means. A tag can't be the name of a field or facet of its
+entity's type: `[[ID#title]]` shows the field.
+
+### Where the number comes from
+
+Every heading below a page's title is numbered, `1`, `1.2`, `1.2.3`, and an
+ordered list's items `2`, then `2(b)`, then `2(b)(iii)`. Numbers are counted
+on the page being rendered, after embedded entities are placed, so an
+entity's sections have one number on its own page and another inside a
+document that embeds it. A reference shows the number its target has where
+the reference is: `[[#preparation]]` in VER-0001 shows *Section 1* on
+VER-0001's page and *Section 5.1.1* inside the protocol that embeds it.
+`[[VER-0001#preparation]]` in a document that doesn't embed VER-0001 shows
+VER-0001's own number, *Section 1 of VER-0001*, linked to its page.
+
+Each heading's number is in the page as `<span class="section-number">`.
+Whether it is shown is up to the stylesheet, per type if you like; a
+reference shows the number either way:
+
+```css
+body[data-type="Requirement"] main .section-number,
+.embed[data-type="Requirement"] .section-number { display: none; }
+```
+
+[Styling the export]({{< relref "docs/concepts/styling#remove-section-numbers-from-requirements-only" >}})
+explains these selectors.
+
+### What a reference shows
+
+A mode after the tag chooses what is shown. The default suits most
+sentences; `:number` lets you word the reference yourself.
+
+| Reference | Heading | List item | Caption |
+| --- | --- | --- | --- |
+| `[[#x]]` or `[[#x:full]]` | Section 3.4 | item 2(b) | Figure 1 |
+| `clause [[#x:number]]` | clause 3.4 | clause 2(b) | clause 1 |
+| `[[#x:title]]` | Setup | its first paragraph | the caption's text |
+| `[[#x:long]]` | Section 3.4 Setup | item 2(b) Zero the probe. | Figure 1 Wiring diagram |
+| `[[#x\|the setup]]` | the setup | the setup | the setup |
+
+References to another entity add "of ID" in every mode. The link's class is
+`section-ref`, `item-ref` or, for a caption, `xref`.
+
+`provenance validate` reports a tag used twice in an entity, a tag that
+isn't lower-case letters, digits and `-`, one on anything but a heading or
+an ordered list item, one named like a field, a reference to a tag that
+doesn't exist, and an unknown mode. A rename that deletes a heading is
+caught at the merge gate.
 
 ## Reference lists
 
