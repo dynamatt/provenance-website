@@ -139,7 +139,7 @@ text: The blocks of the control loop, *as built*.
 | Key | Meaning |
 | --- | --- |
 | `kind` | `figure`, `table` or `equation`. Required. |
-| `id` | A name for references to this caption. Letters, digits, `-` and `_`. |
+| `id` | A name for references to this caption. Letters, digits, `-` and `_`; unique within the entity, tags included. |
 | `text` | The caption, in Markdown. |
 
 The block must come right after what it captions: a paragraph holding only
@@ -150,8 +150,13 @@ code `2`, so a caption is never attached to the wrong thing.
 A reference `[[#control-loop]]` becomes a link to the caption showing its
 number, such as *Figure 1*. This works even when the reference comes before
 the figure, and the numbers follow when figures are reordered.
-`[[#control-loop|the control loop]]` keeps its own text. Captions in an
-embedded entity are numbered as part of the document that embeds it.
+`[[#control-loop|the control loop]]` keeps its own text, and
+`[[#control-loop:number]]`, `:title` and `:long` show *1*, the caption's
+text, or both. Captions in an embedded entity are numbered as part of the
+document that embeds it. `[[#id]]` names a caption of the entity that
+writes it; another entity's is `[[ID#id]]`. Headings and list items can be
+referred to the same way: see
+[Section and item references]({{< relref "docs/concepts/documents#section-and-item-references" >}}).
 
 ### Caption kinds
 
