@@ -47,21 +47,33 @@ heading's line, or of the item's first paragraph:
 ## Preparation {#preparation}
 
 1. Fill the saline tank to its mark. {#fill-tank}
-2. Warm up the bench equipment for 30 minutes.
+1. Warm up the bench equipment for 30 minutes.
    1. Power on the ECAP simulator.
-   2. Zero the current probe with the lead disconnected. {#zero-probe}
+   1. Zero the current probe with the lead disconnected. {#zero-probe}
+1. Load the response profiles into the simulator.
 
 Begin only once [[#preparation]] is complete; the probe zeroed in
 [[#zero-probe]] must not be re-clipped.
 ```
 
-renders, on the entity's own page, as "Begin only once Section 1 is
-complete; the probe zeroed in item 2(b) must not be re-clipped."
+The example above renders, on the entity's own page, as "Begin only once
+Section 1 is complete; the probe zeroed in item 2(b) must not be
+re-clipped."
 
-A tag is lower-case letters, digits and `-`, unique within its entity, and
-shares one namespace with the entity's caption ids, so `[[#x]]` never has to
-say which it means. A tag can't be the name of a field or facet of its
-entity's type: `[[ID#title]]` shows the field.
+Every step is written `1.`, and still numbers 1, 2, 3. Markdown counts an
+ordered list's items itself: only the first item's number matters, as the
+number the list starts from, so writing `1.` for every step lets you add,
+remove or reorder steps without renumbering the rest. Markdown has no
+lettered or roman-numeral lists either: write nested steps with digits, as
+above. Provenance numbers the nested items `2(a)`, `2(b)`, and the
+stylesheet draws them as letters beside the steps
+([Numbered lists]({{< relref "docs/concepts/styling#numbered-lists" >}})).
+
+A tag is lower-case letters, digits and `-`, and unique within its entity.
+It shares one namespace with the entity's caption ids, so `[[#x]]` never has
+to say which it means. A tag can't be the name of a field or facet of its
+entity's type, because `[[ID#title]]` would show the field: `provenance
+validate` reports `{#title}` as an error (`content/tag`) at its line.
 
 ### Where the number comes from
 

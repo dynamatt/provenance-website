@@ -6,7 +6,8 @@ description: "The HTML the website export writes for each kind of content, and t
 The exported website is plain HTML and one stylesheet,
 `templates/style.css`, which replaces the built-in one. This page describes
 the HTML the export writes for each kind of content, so you know which
-selector reaches the thing you want to change.
+selector reaches the thing you want to change, and ends with
+[recipes](#recipes) built from those selectors.
 
 ## Who writes the markup
 
@@ -46,53 +47,6 @@ A project layout writes the same attributes from `.Page`, `.Type` and
 ```go-html-template
 <body data-page="{{.Page}}"{{with .Type}} data-type="{{.}}"{{end}}{{with .Entity}} data-entity="{{.}}"{{end}}>
 ```
-
-## Recipes
-
-### Remove section numbers from requirements only
-
-A requirement can appear on its own page and embedded in a document. To hide
-its section numbers in both places, and nowhere else:
-
-```css
-/* A requirement's own page. */
-body[data-type="Requirement"] main .section-number,
-/* A requirement embedded anywhere: a document, a query block. */
-.embed[data-type="Requirement"] .section-number {
-  display: none;
-}
-```
-
-The numbers are still counted: a document that embeds a requirement still
-numbers the sections after it as if the requirement's headings had numbers,
-and a [reference]({{< relref "docs/concepts/documents#section-and-item-references" >}})
-to one of its headings still shows its number. Hiding is display only.
-
-Each selector matches everything *inside* the requirement too. If a
-requirement embeds another entity whose numbers you want to keep, put them
-back:
-
-```css
-.embed[data-type="Requirement"] .embed:not([data-type="Requirement"]) .section-number,
-body[data-type="Requirement"] main .embed:not([data-type="Requirement"]) .section-number {
-  display: inline;
-}
-```
-
-### Other things you might want
-
-| To | CSS |
-| --- | --- |
-| Hide every section number | `.section-number { display: none; }` |
-| Show section numbers in documents only | `.section-number { display: none; }` then `body[data-type="Document"] main .section-number, .embed[data-type="Document"] .section-number { display: inline; }` |
-| Hide numbers on a requirement's own page, but keep them when a document embeds it | `body[data-type="Requirement"] main .section-number { display: none; }` |
-| Box every embedded requirement | `.embed[data-type="Requirement"] { border: 1px solid #ccc; padding: 8px 16px; }` |
-| Hide the field table of embedded entities (built-in template) | `.embed .fields { display: none; }` |
-| Hide the type label above each entity (built-in template) | `.entity-type { display: none; }` |
-| Style one entity | `[data-entity="REQ-0001"]`: its page's `<body>` and every embed of it |
-| Show the number after "Figure" in bold | `.caption-number { font-weight: 600; }` |
-| Letters for nested steps, then roman numerals | `ol ol { list-style-type: lower-alpha; } ol ol ol { list-style-type: lower-roman; }` (built in) |
-| Style references to sections differently from links to entities | `a.section-ref { … }` and `a.ref:not(.section-ref):not(.item-ref):not(.xref) { … }` |
 
 ## The page
 
@@ -211,8 +165,10 @@ the tag as its `id`, like a heading:
 </ol>
 ```
 
-The number a reference shows (`2(b)`, `2(b)(iii)`) is counted by
-Provenance; the number beside the item is drawn by the browser from
+The `<ol>` is the same however the Markdown writes the numbers: `1.` for
+every item, or `1.`, `2.`, `3.`. Only a first number other than 1 is kept,
+as `<ol start="3">`. The number a reference shows (`2(b)`, `2(b)(iii)`) is
+counted by Provenance; the number beside the item is drawn by the browser from
 `list-style-type`. The built-in stylesheet draws nested lists as letters,
 then roman numerals, to match. Keep those two rules if you write your own
 stylesheet, or the page and its references disagree.
@@ -274,3 +230,50 @@ The built-in page of a type with `pages: false`:
   <section class="type-entity">…</section>
 </article>
 ```
+
+## Recipes
+
+### Remove section numbers from requirements only
+
+A requirement can appear on its own page and embedded in a document. To hide
+its section numbers in both places, and nowhere else:
+
+```css
+/* A requirement's own page. */
+body[data-type="Requirement"] main .section-number,
+/* A requirement embedded anywhere: a document, a query block. */
+.embed[data-type="Requirement"] .section-number {
+  display: none;
+}
+```
+
+The numbers are still counted: a document that embeds a requirement still
+numbers the sections after it as if the requirement's headings had numbers,
+and a [reference]({{< relref "docs/concepts/documents#section-and-item-references" >}})
+to one of its headings still shows its number. Hiding is display only.
+
+Each selector matches everything *inside* the requirement too. If a
+requirement embeds another entity whose numbers you want to keep, put them
+back:
+
+```css
+.embed[data-type="Requirement"] .embed:not([data-type="Requirement"]) .section-number,
+body[data-type="Requirement"] main .embed:not([data-type="Requirement"]) .section-number {
+  display: inline;
+}
+```
+
+### Other things you might want
+
+| To | CSS |
+| --- | --- |
+| Hide every section number | `.section-number { display: none; }` |
+| Show section numbers in documents only | `.section-number { display: none; }` then `body[data-type="Document"] main .section-number, .embed[data-type="Document"] .section-number { display: inline; }` |
+| Hide numbers on a requirement's own page, but keep them when a document embeds it | `body[data-type="Requirement"] main .section-number { display: none; }` |
+| Box every embedded requirement | `.embed[data-type="Requirement"] { border: 1px solid #ccc; padding: 8px 16px; }` |
+| Hide the field table of embedded entities (built-in template) | `.embed .fields { display: none; }` |
+| Hide the type label above each entity (built-in template) | `.entity-type { display: none; }` |
+| Style one entity | `[data-entity="REQ-0001"]`: its page's `<body>` and every embed of it |
+| Show the number after "Figure" in bold | `.caption-number { font-weight: 600; }` |
+| Letters for nested steps, then roman numerals | `ol ol { list-style-type: lower-alpha; } ol ol ol { list-style-type: lower-roman; }` (built in) |
+| Style references to sections differently from links to entities | `a.section-ref { … }` and `a.ref:not(.section-ref):not(.item-ref):not(.xref) { … }` |
