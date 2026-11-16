@@ -63,6 +63,7 @@ the gate.
 | `rules/query` | error | A rule whose query does not fit the schema |
 | `rules/severity` | error | A rule severity other than error or warning |
 | `rules/unknown-key` | error | A key a rule file does not have |
+| `schema/abstract-type` | error | An entity of an abstract type |
 | `schema/calculated-set` | error | A calculated field written in the file |
 | `schema/enum-value` | error | A value not in its enum |
 | `schema/file` | error | A schema file that cannot be loaded |

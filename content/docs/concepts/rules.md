@@ -153,13 +153,16 @@ where:
 ### Comparing within an entity, row by row
 
 A `where` on a list tests each row on its own and reports each one that
-fails at its line. Equipment whose calibration had lapsed when the test ran:
+fails at its line. Equipment whose calibration had lapsed when the test ran,
+in verification and validation evidence alike: both types
+[extend]({{< relref "docs/concepts/schema#abstract-types" >}}) `Evidence`,
+which declares `equipment_used`, so one rule checks both:
 
 ```yaml
 # rules/equipment-calibration-current.yaml
 severity: error
-message: "equipment calibration was not current at time of test execution"
-from: VerificationEvidence
+message: "equipment calibration was not current at the time of execution"
+from: Evidence
 where:
   field: equipment_used
   where:
@@ -321,7 +324,7 @@ a [type template]({{< relref "docs/concepts/templates#type-templates" >}}),
 or nothing when the violation is about no entity, such as a problem in a
 rule file. A built-in check's `.Message` is its short description.
 
-Reports have the template functions `link`, `href` and `short`, but not
+Reports have the template functions `link`, `href`, `title`, `isa` and `short`, but not
 `markdown`. Links are relative to the exported site's main page, so a report
 written there links to each entity's page:
 

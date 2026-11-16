@@ -13,3 +13,7 @@ you can export it and see the result.
 - [Glossary]({{< relref "docs/cookbook/glossary" >}}): terms defined once as
   entities, cited inline in any document, and listed in a *Definitions*
   section at the end of each document that uses them.
+- [Reusable documents]({{< relref "docs/cookbook/reusable-documents" >}}):
+  a kind of document written once, as a type extending Document and a
+  template filling a block of Document's, so each report holds only its
+  prose and what it covers.

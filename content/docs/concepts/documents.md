@@ -249,6 +249,7 @@ A condition names a `field`, an `operator` and, for most operators, a
 | `not_in` | has none of a list of values, written `value: [a, b]`. This includes a field with no value at all. |
 | `exists` | has at least one value. Takes no `value`. |
 | `missing` | has no value. Takes no `value`. |
+| `is_a` | Only on `type`: the entity is of the named type or a type [extending]({{< relref "docs/concepts/schema#extending-a-type" >}}) it. `value` names a declared type. |
 
 `value` is a literal. `value_of` names another field to compare with:
 
@@ -281,11 +282,13 @@ where:
 | --- | --- |
 | `status` | A field of the entity. |
 | `verified_by` | A reverse link: the entities that link to this one through that `reverse_name`. |
-| `id`, `type` | The entity's ID and type. |
+| `id`, `type` | The entity's ID and its own type. `equals` compares the type exactly; `is_a` includes the types extending it. |
 | `code_blocks` | The entity's fenced code blocks, a list with one row per block (see [Other fenced blocks](#other-fenced-blocks)). |
 | `^execution_date` | Inside a sub-query (below), a field of the entity around it. `^^` reads two levels out. |
 
-`from: any` selects every entity type.
+`from: any` selects every entity type. A type in `from:` stands for itself
+and every type
+[extending it]({{< relref "docs/concepts/schema#where-a-type-stands-for-its-subtypes" >}}).
 
 ### Rows and linked entities
 
