@@ -71,6 +71,7 @@ missing name: `{{with index . "status"}}…{{end}}`.
 | `boolean` | `true` or `false`. |
 | `link`, one target | The linked entity, with all its own accessors, or nothing. |
 | `link`, many targets | A list of linked entities. |
+| `query` | A list of the entities the query selects, in its order, like a many-link. Empty when the query can't run. |
 | `list` of rows | A list of rows, each with its sub-fields by name. |
 | `list` with `of:` a type or enum | A list of plain values. |
 | `calculated` | The formula's result, or nothing when it is blank or can't be evaluated. |
@@ -185,6 +186,8 @@ recipe puts this together.
 | `link .Entity "text"` | The same link showing the text. Any value works, such as a number: `{{link . .TypeCitationIndex}}`. |
 | `href .Entity` | The relative URL of the entity's page, for a link of your own. Empty for an entity outside the scope, which has no page. |
 | `title .Entity` | The entity's title: the value of the field its type marks `title: true`. Nothing for a type without one. |
+| `collect .List "field" …` | Follows each named field (a link, a reverse link or a query field) from every entity in the list, in turn, and gives the entities reached, each once, ordered by ID. `{{range collect .scope "verified_by" "equipment_needed"}}` lists each piece of equipment once, however many protocols need it. The list may be one entity. A name the entities don't have stops the export. |
+| `queryof .Entity "field"` | The query of a [query field]({{< relref "docs/concepts/schema#query-fields" >}}), as YAML, for a report to state what it covers. |
 | `isa .Entity "Type"` | `true` when the entity's type is that type or [extends]({{< relref "docs/concepts/schema#extending-a-type" >}}) it, so `{{if isa . "Document"}}` holds for a report too, where `{{if eq .Type "Document"}}` doesn't. A type the schema doesn't declare stops the export. |
 | `short .SHA` | A commit hash shortened to seven characters. |
 

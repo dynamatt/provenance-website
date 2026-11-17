@@ -66,10 +66,10 @@ are:
 | `body` | `text` | Stores this field as the Markdown body below the frontmatter. At most one top-level `text` field per type may set it; a type without one has a freeform body. |
 | `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
 | `cardinality` | `link` | `one` (a single ID) or `many` (a list of IDs). Required. |
-| `reverse_name` | `link` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
+| `reverse_name` | `link`, `query` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
 | `formula` | `calculated` | The expression the value is computed from. See [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | `fields` | `list` | The list's row fields, declared inline. |
-| `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
+| `of` | `list`, `query` | The type the list holds: a built-in type, an enum or a record. For a query field, the entity types its query may select, e.g. `[Requirement]`. Required. |
 | `column` | any field of a type with a `source` | The CSV header the field reads, when it isn't the field's name. |
 
 There are no default values. What an entity's file says is its whole
@@ -91,6 +91,7 @@ or an empty list is an error at the entity's `id:` line.
 | `link` | The ID of another entity (`cardinality: one`) or a list of IDs (`cardinality: many`). |
 | `list` | A list of rows, or of values of one type. See [Lists](#lists). |
 | `calculated` | Nothing: the value is never stored. It is computed from `formula`; see [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
+| `query` | A query: `from`, and `where` and `order_by` if wanted. The value is the entities it selects. See [Query fields](#query-fields). |
 | *an enum's name* | One of the enum's values. |
 
 ## Enums
@@ -127,6 +128,83 @@ The requirement then has a derived `verified_by` relationship, listing
 every protocol that verifies it. A `reverse_name` must not repeat a field
 declared on the target type, because the relationship would then be stored
 twice.
+
+## Query fields
+
+A query field holds a query instead of IDs. Its value is the entities the
+query selects, worked out at every export and every `validate`, so it
+never falls behind them. Use one where an entity says *which* entities it is
+about rather than listing them, such as the requirements a report covers.
+
+```yaml
+# schema/VerificationSummaryReport.yaml
+  - name: scope
+    type: query
+    of: [Requirement]
+    reverse_name: reported_in
+```
+
+```yaml
+# DOC/DOC-0006.md frontmatter
+scope:
+  from: Requirement
+  where:
+    field: status
+    operator: equals
+    value: approved
+  order_by: order
+```
+
+The query is written like a
+[query block]({{< relref "docs/concepts/documents#query-blocks" >}})'s:
+`from`, `where` and `order_by`, with the same conditions. `from` must name
+types in the field's `of:`, or types extending them. A query block's
+`render` and `template` don't apply: the entity's template shows the
+results.
+
+Everywhere else the field reads like a link with `cardinality: many` to
+the entities selected, in the query's order:
+
+| Where | Reads |
+| --- | --- |
+| A template | `.scope`, a list of entities. `queryof . "scope"` gives the query itself. See [Templates]({{< relref "docs/concepts/templates#values" >}}). |
+| A condition or rule | `{field: scope, where: …}`, `exists`, `missing`, as for a link. |
+| A formula | `COUNT(scope)`, `scope.order`, as for a link. |
+| The selected entities | `reported_in`, its `reverse_name`, as for a link. |
+
+### Reading the entity that holds the query
+
+`^field` in the query reads the entity holding it, as in a
+[sub-query]({{< relref "docs/concepts/documents#other-entities" >}}). A
+report can then be about one requirement and cover it and the requirements
+refining it, with a query every such report shares:
+
+```yaml
+covers: REQ-0002
+scope:
+  from: Requirement
+  where:
+    any_of:
+      - field: id
+        operator: equals
+        value_of: ^covers
+      - field: parent_requirement
+        operator: equals
+        value_of: ^covers
+```
+
+### Queries that read each other
+
+A query may select by a calculated field, and a formula may count a
+query's results. A query may also select by the `reverse_name` another
+query field feeds. Provenance works out the order. A query that depends on
+its own results through `missing`, `not_in`, `not_equals` or a count has no
+answer: one report selecting the requirements no report covers, itself
+included, is an example. `provenance validate` reports each query in such
+a loop, and its value is empty.
+
+A query field can't be a sub-field of a list's rows, nor a field of a type
+read from a [CSV file]({{< relref "docs/concepts/importing-data" >}}).
 
 ## Lists
 
@@ -379,7 +457,9 @@ schema cannot be read, for example when:
 - `extends:` names no type, or leads back to the type;
 - a type declares a field the type it extends already has;
 - an abstract type has an `id_prefix` or a `source:`, or `abstract` is
-  not `true` or `false`.
+  not `true` or `false`;
+- a query field has no `of:`, is in a list's rows, or is on a type with a
+  `source:`.
 
 Other problems don't stop the schema loading; `provenance validate`
 reports each of them at its file and line:
@@ -397,5 +477,6 @@ reports each of them at its file and line:
 `provenance validate` also checks every entity against its type: fields
 the type doesn't declare, values of the wrong type or outside their enum,
 calculated fields written in the file, unknown sub-fields in list rows,
-entities of an [abstract type](#abstract-types), and IDs that aren't the type's `id_prefix`, a hyphen and at least four
+entities of an [abstract type](#abstract-types), [query fields](#query-fields)
+whose query can't run (`schema/query`, at its line in the query), and IDs that aren't the type's `id_prefix`, a hyphen and at least four
 digits.
