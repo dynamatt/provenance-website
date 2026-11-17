@@ -63,6 +63,7 @@ the gate.
 | `rules/query` | error | A rule whose query does not fit the schema |
 | `rules/severity` | error | A rule severity other than error or warning |
 | `rules/unknown-key` | error | A key a rule file does not have |
+| `schema/abstract-type` | error | An entity of an abstract type |
 | `schema/calculated-set` | error | A calculated field written in the file |
 | `schema/enum-value` | error | A value not in its enum |
 | `schema/file` | error | A schema file that cannot be loaded |
@@ -71,6 +72,7 @@ the gate.
 | `schema/invalid-value` | error | A value not of its field's type |
 | `schema/link-target` | error | A link field targeting an undeclared type |
 | `schema/list-row` | error | A list row with a key its list does not have |
+| `schema/query` | error | A query field whose query cannot run |
 | `schema/required` | error | A required field not set |
 | `schema/unknown-field` | error | A frontmatter key the type does not have |
 | `schema/unknown-key` | error | A key the schema language does not have |

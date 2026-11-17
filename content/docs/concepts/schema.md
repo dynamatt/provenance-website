@@ -66,10 +66,10 @@ are:
 | `body` | `text` | Stores this field as the Markdown body below the frontmatter. At most one top-level `text` field per type may set it; a type without one has a freeform body. |
 | `target` | `link` | The entity types a link may point to, e.g. `[Requirement, Design]`. |
 | `cardinality` | `link` | `one` (a single ID) or `many` (a list of IDs). Required. |
-| `reverse_name` | `link` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
+| `reverse_name` | `link`, `query` | The name under which the target sees this link, e.g. `implemented_by` for `implements`. |
 | `formula` | `calculated` | The expression the value is computed from. See [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
 | `fields` | `list` | The list's row fields, declared inline. |
-| `of` | `list` | The type the list holds: a built-in type, an enum or a record. |
+| `of` | `list`, `query` | The type the list holds: a built-in type, an enum or a record. For a query field, the entity types its query may select, e.g. `[Requirement]`. Required. |
 | `column` | any field of a type with a `source` | The CSV header the field reads, when it isn't the field's name. |
 
 There are no default values. What an entity's file says is its whole
@@ -91,6 +91,7 @@ or an empty list is an error at the entity's `id:` line.
 | `link` | The ID of another entity (`cardinality: one`) or a list of IDs (`cardinality: many`). |
 | `list` | A list of rows, or of values of one type. See [Lists](#lists). |
 | `calculated` | Nothing: the value is never stored. It is computed from `formula`; see [Calculated fields]({{< relref "docs/concepts/calculated-fields" >}}). |
+| `query` | A query: `from`, and `where` and `order_by` if wanted. The value is the entities it selects. See [Query fields](#query-fields). |
 | *an enum's name* | One of the enum's values. |
 
 ## Enums
@@ -127,6 +128,84 @@ The requirement then has a derived `verified_by` relationship, listing
 every protocol that verifies it. A `reverse_name` must not repeat a field
 declared on the target type, because the relationship would then be stored
 twice.
+
+## Query fields
+
+A query field holds a query instead of IDs. Its value is the entities the
+query selects, worked out at every export and every `validate`, so it
+never falls behind them. Use one where an entity says *which* entities it is
+about rather than listing them, such as the requirements a report covers.
+
+```yaml
+# schema/VerificationSummaryReport.yaml
+  - name: scope
+    type: query
+    of: [Requirement]
+    reverse_name: reported_in
+```
+
+```yaml
+# DOC/DOC-0006.md frontmatter
+scope:
+  from: Requirement
+  where:
+    field: status
+    operator: equals
+    value: approved
+  order_by: order
+```
+
+The query is written like a
+[query block]({{< relref "docs/concepts/documents#query-blocks" >}})'s:
+`from`, `where` and `order_by`, with the same conditions. `from` must name
+types in the field's `of:`, or types extending them. A query block's
+`render` and `template` don't apply: the entity's template shows the
+results.
+
+Everywhere else the field reads like a link with `cardinality: many` to
+the entities selected, in the query's order:
+
+| Where | Reads |
+| --- | --- |
+| A template | `.scope`, a list of entities. See [Templates]({{< relref "docs/concepts/templates#values" >}}). |
+| A condition or rule | `{field: scope, where: …}`, `exists`, `missing`, as for a link. |
+| A formula | `COUNT(scope)`, `scope.order`, as for a link. |
+| The selected entities | `reported_in`, its `reverse_name`, as for a link. |
+
+### Reading the entity that holds the query
+
+`^field` in the query reads the entity holding it, as in a
+[sub-query]({{< relref "docs/concepts/documents#other-entities" >}}). A
+report can then name the build it summarises and select the component that
+build is of, with a query every such report shares:
+
+```yaml
+build: BLD-0002
+scope:
+  from: Component
+  where:
+    field: builds
+    where:
+      field: id
+      operator: equals
+      value_of: ^^build
+```
+
+Each sub-query adds a level: inside the condition on a component's
+`builds`, `^` is the component and `^^` the report.
+
+### Queries that read each other
+
+A query may select by a calculated field, and a formula may count a
+query's results. A query may also select by the `reverse_name` another
+query field feeds. Provenance works out the order. A query that depends on
+its own results through `missing`, `not_in`, `not_equals` or a count has no
+answer: one report selecting the requirements no report covers, itself
+included, is an example. `provenance validate` reports each query in such
+a loop, and its value is empty.
+
+A query field can't be a sub-field of a list's rows, nor a field of a type
+read from a [CSV file]({{< relref "docs/concepts/importing-data" >}}).
 
 ## Lists
 
@@ -229,6 +308,110 @@ A record's fields follow the same rules as a list's inline `fields`. They
 may include links and lists, including lists of other records. A record may
 not contain itself, directly or through other records.
 
+## Extending a type
+
+A type can extend another with `extends:`. It has every field of the type
+it extends, first and in that type's order, then the fields it declares
+itself. Use it when several types share fields, such as two kinds of
+evidence, or when a type is a kind of another, such as a report that is a
+document.
+
+```yaml
+# schema/VerificationSummaryReport.yaml
+type: VerificationSummaryReport
+extends: Document
+fields:
+  - name: scope
+    type: link
+    target: [Requirement]
+    cardinality: many
+    reverse_name: reported_in
+```
+
+A verification summary report then has Document's `title` and `status`,
+then its `scope`. A type extends one other type, which may itself extend
+another; it may not lead back to itself. It adds fields and never changes
+its parent's: declaring a field the parent already has is an error.
+Calculated fields are inherited like any other, and so are the reverse
+links its parent's fields give other types.
+
+### Where a type stands for its subtypes
+
+Wherever a type is named, it stands for itself and every type extending
+it:
+
+| Where | Means |
+| --- | --- |
+| A link's `target: [Document]` | The link may point at a Document or a verification summary report. |
+| `from: Document` in a query block or rule | Every Document and every verification summary report. |
+| `templates: {Document: …}` in a query block | The template is used for both, unless a subtype is given its own. |
+| A reverse link to `Document` | Verification summary reports have it too. |
+
+A condition's `type` is still the entity's own type, so
+`{field: type, operator: equals, value: Document}` matches plain Documents
+only. To include the types extending one, use
+[`is_a`]({{< relref "docs/concepts/documents#conditions" >}}):
+`{field: type, operator: is_a, value: Document}`. Templates have the same
+test as [`isa`]({{< relref "docs/concepts/templates#functions" >}}).
+
+### IDs
+
+A type extending another numbers its entities in its parent's series,
+unless it declares an `id_prefix` of its own. A verification summary
+report without one is `DOC-0006`, beside the plain Documents, the way
+controlled documents are numbered whatever their kind. Its file's `type:`
+says which type it is. Two types may share a prefix only this way, down
+one chain of types.
+
+### Abstract types
+
+A type marked `abstract: true` has no entities of its own: it declares
+fields for the types extending it, and has no `id_prefix`.
+
+```yaml
+# schema/Evidence.yaml
+type: Evidence
+abstract: true
+fields:
+  - name: title
+    type: string
+    title: true
+    required: true
+  - name: execution_date
+    type: date
+    required: true
+  - name: equipment_used
+    type: list
+    of: Equipment
+
+# schema/VerificationEvidence.yaml
+type: VerificationEvidence
+extends: Evidence
+id_prefix: EVD
+fields:
+  - name: tests
+    type: link
+    target: [VerificationProtocol]
+    cardinality: one
+```
+
+Named in `from:` or a link's `target:`, an abstract type stands for its
+subtypes alone. One rule `from: Evidence` checks verification and
+validation evidence alike. An entity whose `type:` is an abstract type is
+an error.
+
+### What isn't inherited
+
+Only fields are inherited. `source:`, `pages:` and `abstract:` describe the
+type itself, so a type extending another declares its own, and
+`id_prefix` is inherited only as described in [IDs](#ids). An entity's
+page shows its own type, and the main page lists it under that type.
+
+Because inherited fields come first, moving a field from a type to a type
+it extends changes the order of its entities' frontmatter.
+[`provenance fmt`]({{< relref "docs/concepts/formatting" >}}) rewrites
+them.
+
 ## Entities without pages
 
 Each entity has its own page in the export, unless its type says
@@ -271,7 +454,13 @@ schema cannot be read, for example when:
 - `title: true` is on a field that isn't a top-level `string`, or on two
   fields of one type;
 - a list has neither `fields` nor `of`, or has both;
-- a record contains itself.
+- a record contains itself;
+- `extends:` names no type, or leads back to the type;
+- a type declares a field the type it extends already has;
+- an abstract type has an `id_prefix` or a `source:`, or `abstract` is
+  not `true` or `false`;
+- a query field has no `of:`, is in a list's rows, or is on a type with a
+  `source:`.
 
 Other problems don't stop the schema loading; `provenance validate`
 reports each of them at its file and line:
@@ -281,12 +470,14 @@ reports each of them at its file and line:
 - a link `target` that names no declared type;
 - a formula that doesn't parse, names a field that doesn't exist, or
   depends on itself;
-- a type without an `id_prefix`, or two types sharing one;
+- a type without an `id_prefix`, or two types sharing one other than
+  down one [chain of types](#ids);
 - and, as warnings, an enum or record nothing uses, and an entity type
   with no entities and no links to or from it.
 
 `provenance validate` also checks every entity against its type: fields
 the type doesn't declare, values of the wrong type or outside their enum,
 calculated fields written in the file, unknown sub-fields in list rows,
-and IDs that aren't the type's `id_prefix`, a hyphen and at least four
+entities of an [abstract type](#abstract-types), [query fields](#query-fields)
+whose query can't run (`schema/query`, at its line in the query), and IDs that aren't the type's `id_prefix`, a hyphen and at least four
 digits.

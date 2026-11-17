@@ -12,7 +12,7 @@ wants to look different.
 
 | File | Replaces | Used for |
 | --- | --- | --- |
-| `templates/<Type>.tmpl` | The built-in entity page | Every entity of that type: its own page, and wherever it is embedded with `![[ID]]` or shown in full by a query block. `Requirement.tmpl` for `Requirement`. |
+| `templates/<Type>.tmpl` | The built-in entity page | Every entity of that type: its own page, and wherever it is embedded with `![[ID]]` or shown in full by a query block. `Requirement.tmpl` for `Requirement`. Types extending it without a template of their own use it too; see [Types that extend another](#types-that-extend-another). |
 | `templates/<name>.tmpl` | Nothing | Only where a query block chooses it. The name is lower-case and hyphenated, such as `requirement-checklist`. See [Custom templates]({{< relref "docs/concepts/documents#custom-templates" >}}). |
 | `templates/_cite.tmpl` | The plain ID of `[[ID]]` | Every inline citation. See [Citation style]({{< relref "docs/concepts/documents#citation-style" >}}). |
 | `templates/_layout.tmpl` | The built-in layout | The HTML around every page: head, header, footer, revision history. |
@@ -71,6 +71,7 @@ missing name: `{{with index . "status"}}…{{end}}`.
 | `boolean` | `true` or `false`. |
 | `link`, one target | The linked entity, with all its own accessors, or nothing. |
 | `link`, many targets | A list of linked entities. |
+| `query` | A list of the entities the query selects, in its order, like a many-link. Empty when the query can't run. |
 | `list` of rows | A list of rows, each with its sub-fields by name. |
 | `list` with `of:` a type or enum | A list of plain values. |
 | `calculated` | The formula's result, or nothing when it is blank or can't be evaluated. |
@@ -126,6 +127,56 @@ shortened:
 </article>
 ```
 
+### Types that extend another
+
+A type that [extends]({{< relref "docs/concepts/schema#extending-a-type" >}})
+another and has no template of its own uses the nearest template up its
+chain: a verification summary report, which extends Document, is laid out by
+`Document.tmpl`.
+
+To change only part of that layout, the parent's template declares a
+*block*, a named place with nothing in it, and the subtype's template fills
+it. Blocks are Go's own `{{block}}` and `{{define}}`:
+
+```go-html-template
+{{/* templates/Document.tmpl */}}
+<article class="document" id="{{.ID}}">
+<h1><span class="id">{{.ID}}</span> {{title .}}</h1>
+{{- block "before-body" .}}{{end}}
+<div class="body">{{markdown .Body}}</div>
+{{- block "after-body" .}}{{end}}
+…
+</article>
+```
+
+```go-html-template
+{{/* templates/VerificationSummaryReport.tmpl */}}
+{{define "after-body"}}
+<section class="trace-matrix">
+<h2>Traceability matrix</h2>
+<table>
+{{- range .scope}}
+<tr><td>{{link .}}</td><td>{{range .verified_by}}{{link .}} {{end}}</td></tr>
+{{- end}}
+</table>
+</section>
+{{end}}
+```
+
+A template holding nothing but `{{define}}`s, white space and comments is
+laid over the template chosen for the type above it, rather than replacing
+it. The report keeps Document's heading, status, body and reference list,
+and adds its matrix after the body. A type further down the chain can fill
+another block over both. A template with anything else in it replaces its
+parent's entirely.
+
+The built-in entity page declares two blocks, `before-body` and
+`after-body`, around the body, so a type can add to the built-in page
+without writing a whole template. Inside either block, `.` is the entity, as
+in any type template. The
+[Reusable documents]({{< relref "docs/cookbook/reusable-documents" >}})
+recipe puts this together.
+
 ## Functions
 
 | Function | Result |
@@ -135,6 +186,9 @@ shortened:
 | `link .Entity "text"` | The same link showing the text. Any value works, such as a number: `{{link . .TypeCitationIndex}}`. |
 | `href .Entity` | The relative URL of the entity's page, for a link of your own. Empty for an entity outside the scope, which has no page. |
 | `title .Entity` | The entity's title: the value of the field its type marks `title: true`. Nothing for a type without one. |
+| `collect .List "field" …` | Follows each named field (a link, a reverse link or a query field) from every entity in the list, in turn, and gives the entities reached, each once, ordered by ID. `{{range collect .scope "verified_by" "equipment_needed"}}` lists each piece of equipment once, however many protocols need it. The list may be one entity. A name the entities don't have stops the export. |
+| `isa .Entity "Type"` | `true` when the entity's type is that type or [extends]({{< relref "docs/concepts/schema#extending-a-type" >}}) it, so `{{if isa . "Document"}}` holds for a report too, where `{{if eq .Type "Document"}}` doesn't. A type the schema doesn't declare stops the export. |
+| `titlecase "Name"` | The name as a title: words split at underscores, hyphens and CamelCase humps, each capitalised but minor words such as *of*, *by* and *the* inside the title, acronyms kept whole. `{{titlecase .Type}}` shows `VerificationSummaryReport` as *Verification Summary Report*, `bill_of_materials` as *Bill of Materials*. The built-in pages show names as written; a template uses this where it wants a heading. |
 | `short .SHA` | A commit hash shortened to seven characters. |
 
 The usual `html/template` functions, such as `index`, `len`, `eq` and
