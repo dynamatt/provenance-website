@@ -25,7 +25,9 @@ once:
 The [example repository](https://github.com/dynamatt/provenance-example)
 implements this recipe: see `schema/VerificationSummaryReport.yaml`,
 `templates/VerificationSummaryReport.tmpl`, `templates/Document.tmpl`,
-`DOC/DOC-0006.md` and `DOC/DOC-0007.md`.
+`DOC/DOC-0006.md` and `DOC/DOC-0007.md`. Its reports go further, with a
+section per component: see
+[Sections by component](#6-sections-by-component).
 
 ## 1. A type that extends Document
 
@@ -215,6 +217,98 @@ where:
   field: reported_in
   operator: missing
 ```
+
+## 6. Sections by component
+
+A report on a whole system reads best as a section per component and a
+subsection per subcomponent, each listing the requirements allocated to
+it. Nothing in Provenance groups: the tree is the components' own links,
+and the nesting is embedding, whose headings Provenance already nests and
+numbers.
+
+Give components a parent, and allocate each requirement to one:
+
+```yaml
+# schema/Component.yaml, added
+  - name: parent
+    type: link
+    target: [Component]
+    cardinality: one
+    reverse_name: subcomponents
+
+# schema/Requirement.yaml, added
+  - name: component
+    type: link
+    target: [Component]
+    cardinality: one
+    reverse_name: requirements
+    required: true
+```
+
+The report's scope selects components, here the top of the tree:
+
+```yaml
+# schema/VerificationSummaryReport.yaml
+  - name: scope
+    type: query
+    of: [Component]
+    reverse_name: reported_in
+
+# DOC/DOC-0006.md
+scope:
+  from: Component
+  where:
+    field: parent
+    operator: missing
+```
+
+A named template, `templates/requirements-of-component.tmpl`, lays out one
+component: a heading, its requirements as matrix rows, then its
+subcomponents, each through the same template. It reaches them with a
+query block it writes and runs with `markdown`, choosing itself again:
+
+```go-html-template
+<section class="component-section">
+<h1>{{title .}} <span class="id">{{.ID}}</span></h1>
+{{- with .requirements}}
+<table class="trace-matrix">…one row per requirement, as in step 3…</table>
+{{- else}}
+<p class="none">No requirement is allocated to {{title .}} itself.</p>
+{{- end}}
+{{- if .subcomponents}}
+{{markdown (printf "```query\nfrom: Component\nwhere:\n  field: parent\n  operator: equals\n  value: %s\ntemplate: requirements-of-component\n```\n" .ID)}}
+{{- end}}
+</section>
+```
+
+The report's template starts the tree the same way, once per component in
+its scope:
+
+```go-html-template
+{{define "after-body"}}
+<section class="report-components">
+<h2>Verification by component</h2>
+{{- range .scope}}
+{{markdown (printf "```query\nfrom: Component\nwhere:\n  field: id\n  operator: equals\n  value: %s\ntemplate: requirements-of-component\n```\n" .ID)}}
+{{- end}}
+</section>
+{{end}}
+```
+
+Each component is embedded as a query block's result is, so its `<h1>`
+nests under the heading before it: the system is section 1.1, the pulse
+generator 1.1.1, its ASIC 1.1.1.1. A component that is its own ancestor is
+an embed cycle, which stops the export.
+
+Two things to know:
+
+- **Page history.** A report's page is marked changed by edits to the
+  components its query reads, but not by an edit to a requirement shown
+  in a section, nor to a protocol or execution in its rows. That is true
+  of anything a template reaches by following links.
+- **Checking coverage.** A report covers its components and everything
+  under them, so the rule checking that every requirement is in a report
+  follows the tree: see `rules/requirement-reported.yaml` in the example.
 
 ## Variations
 
