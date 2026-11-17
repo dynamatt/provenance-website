@@ -27,7 +27,7 @@ implements this recipe: see `schema/VerificationSummaryReport.yaml`,
 `templates/VerificationSummaryReport.tmpl`, `templates/Document.tmpl`,
 `DOC/DOC-0006.md` and `DOC/DOC-0007.md`. Its reports go further, with a
 section per component: see
-[Sections by component](#6-sections-by-component).
+[Sections by component](#5-sections-by-component).
 
 ## 1. A type that extends Document
 
@@ -170,55 +170,7 @@ A second report is a second file with its own query. A requirement with
 no protocol shows *Not verified by any protocol* in the matrix, so a gap
 in coverage is visible in the report rather than left out of it.
 
-## 5. One query for every report about a requirement
-
-A report about one requirement covers it and the requirements refining
-it. Add a `covers` link to the type, and the query reads it from the
-report with `^covers`, so every such report has the same query:
-
-```yaml
-# schema/VerificationSummaryReport.yaml, added
-  - name: covers
-    type: link
-    target: [Requirement]
-    cardinality: one
-```
-
-```markdown
----
-id: DOC-0007
-type: VerificationSummaryReport
-title: Verification Summary Report — Single-Fault Amplitude Ceiling
-status: draft
-covers: REQ-0002
-scope:
-  from: Requirement
-  where:
-    any_of:
-      - field: id
-        operator: equals
-        value_of: ^covers
-      - field: parent_requirement
-        operator: equals
-        value_of: ^covers
-  order_by: order
----
-```
-
-A rule can then check that every requirement is in some report, reading
-`reported_in`:
-
-```yaml
-# rules/requirement-reported.yaml
-severity: warning
-message: "requirement is in no verification summary report"
-from: Requirement
-where:
-  field: reported_in
-  operator: missing
-```
-
-## 6. Sections by component
+## 5. Sections by component
 
 A report on a whole system reads best as a section per component and a
 subsection per subcomponent, each listing the requirements allocated to
@@ -309,6 +261,39 @@ Two things to know:
 - **Checking coverage.** A report covers its components and everything
   under them, so the rule checking that every requirement is in a report
   follows the tree: see `rules/requirement-reported.yaml` in the example.
+
+## 6. A report for a build
+
+A verification summary is often written for one build. Give the report the
+build it summarises, and its query selects the component that build is
+of, reading the build from the report itself:
+
+```yaml
+# schema/VerificationSummaryReport.yaml, added
+  - name: build
+    type: link
+    target: [BuildStandard]
+    cardinality: one
+```
+
+```yaml
+# DOC/DOC-0007.md
+build: BLD-0002
+scope:
+  from: Component
+  where:
+    field: builds
+    where:
+      field: id
+      operator: equals
+      value_of: ^^build
+```
+
+Inside the query, `^` reads the entity holding it, as in any sub-query:
+here the condition is on a component's `builds`, so `^` would be the
+component and `^^` is the report. The query is the same for every report
+about a build; the next build's report changes only `build`. The template
+can name the build too, with `{{with .build}}{{link .}} {{.version}}{{end}}`.
 
 ## Variations
 

@@ -176,22 +176,23 @@ the entities selected, in the query's order:
 
 `^field` in the query reads the entity holding it, as in a
 [sub-query]({{< relref "docs/concepts/documents#other-entities" >}}). A
-report can then be about one requirement and cover it and the requirements
-refining it, with a query every such report shares:
+report can then name the build it summarises and select the component that
+build is of, with a query every such report shares:
 
 ```yaml
-covers: REQ-0002
+build: BLD-0002
 scope:
-  from: Requirement
+  from: Component
   where:
-    any_of:
-      - field: id
-        operator: equals
-        value_of: ^covers
-      - field: parent_requirement
-        operator: equals
-        value_of: ^covers
+    field: builds
+    where:
+      field: id
+      operator: equals
+      value_of: ^^build
 ```
+
+Each sub-query adds a level: inside the condition on a component's
+`builds`, `^` is the component and `^^` the report.
 
 ### Queries that read each other
 
