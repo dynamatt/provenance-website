@@ -340,7 +340,7 @@ a [type template]({{< relref "docs/concepts/templates#type-templates" >}}),
 or nothing when the violation is about no entity, such as a problem in a
 rule file. A built-in check's `.Message` is its short description.
 
-Reports have the template functions `link`, `href`, `title`, `isa`, `collect`, `queryof` and `short`, but not
+Reports have the template functions `link`, `href`, `title`, `isa`, `collect` and `short`, but not
 `markdown`. Links are relative to the exported site's main page, so a report
 written there links to each entity's page:
 

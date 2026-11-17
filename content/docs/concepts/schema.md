@@ -167,7 +167,7 @@ the entities selected, in the query's order:
 
 | Where | Reads |
 | --- | --- |
-| A template | `.scope`, a list of entities. `queryof . "scope"` gives the query itself. See [Templates]({{< relref "docs/concepts/templates#values" >}}). |
+| A template | `.scope`, a list of entities. See [Templates]({{< relref "docs/concepts/templates#values" >}}). |
 | A condition or rule | `{field: scope, where: …}`, `exists`, `missing`, as for a link. |
 | A formula | `COUNT(scope)`, `scope.order`, as for a link. |
 | The selected entities | `reported_in`, its `reverse_name`, as for a link. |

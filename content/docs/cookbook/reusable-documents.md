@@ -86,13 +86,18 @@ than comparing the type, so reports are listed too:
 ## 3. The report's template
 
 Add `templates/VerificationSummaryReport.tmpl`, holding only the blocks it
-fills. Before the prose, the report states its scope:
+fills. Before the prose, the report states its scope, the requirements
+its query selected:
 
 ```go-html-template
 {{define "before-body"}}
 <section class="report-scope">
-<p>This report covers {{.requirement_count}} requirements, selected by:</p>
-<pre class="query"><code>{{queryof . "scope"}}</code></pre>
+<p>This report covers {{.requirement_count}} requirements:</p>
+<ul>
+{{- range .scope}}
+<li>{{link .}}: {{title .}}</li>
+{{- end}}
+</ul>
 </section>
 {{end}}
 ```
