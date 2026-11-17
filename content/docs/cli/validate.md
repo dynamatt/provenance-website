@@ -72,6 +72,7 @@ the gate.
 | `schema/invalid-value` | error | A value not of its field's type |
 | `schema/link-target` | error | A link field targeting an undeclared type |
 | `schema/list-row` | error | A list row with a key its list does not have |
+| `schema/query` | error | A query field whose query cannot run |
 | `schema/required` | error | A required field not set |
 | `schema/unknown-field` | error | A frontmatter key the type does not have |
 | `schema/unknown-key` | error | A key the schema language does not have |

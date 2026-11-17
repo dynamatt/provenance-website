@@ -208,6 +208,12 @@ A query block is a fenced code block with the info string `query`. It
 selects entities of one type, optionally filters and sorts them, and renders
 each one in place.
 
+A query block shows each result on its own. To lay results out together,
+such as a traceability matrix over the requirements a report covers, or
+equipment listed once across every protocol, write the query in a
+[query field]({{< relref "docs/concepts/schema#query-fields" >}}) instead:
+the entity's template then gets every result at once.
+
 ````markdown
 ## Requirements
 

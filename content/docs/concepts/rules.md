@@ -212,6 +212,22 @@ where:
       value_of: ^id
 ```
 
+### A query field's results
+
+A rule reads a [query field]({{< relref "docs/concepts/schema#query-fields" >}})'s
+results like a link, and its `reverse_name` like any other. Requirements no
+verification summary report covers:
+
+```yaml
+# rules/requirement-reported.yaml
+severity: warning
+message: "requirement is in no verification summary report"
+from: Requirement
+where:
+  field: reported_in
+  operator: missing
+```
+
 ### Anything a query can find
 
 Any query is a rule: a project states its own conventions the same way.
@@ -324,7 +340,7 @@ a [type template]({{< relref "docs/concepts/templates#type-templates" >}}),
 or nothing when the violation is about no entity, such as a problem in a
 rule file. A built-in check's `.Message` is its short description.
 
-Reports have the template functions `link`, `href`, `title`, `isa` and `short`, but not
+Reports have the template functions `link`, `href`, `title`, `isa`, `collect`, `titlecase` and `short`, but not
 `markdown`. Links are relative to the exported site's main page, so a report
 written there links to each entity's page:
 
