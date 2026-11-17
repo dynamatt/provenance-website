@@ -27,7 +27,6 @@ are part of the planned command surface: in the current build they print
 | [`release`]({{< relref "release.md" >}}) | Run the release gate and create release tags | — | — |
 | [`release tag`]({{< relref "release-tag.md" >}}) | Run the release-tag gate and create the tag | — | Not yet implemented |
 | [`rename`]({{< relref "rename.md" >}}) | Rename an entity ID and rewrite every reference to it | — | Not yet implemented |
-| [`report`]({{< relref "report.md" >}}) | Generate a coverage or progress report | `--json`, `--metric`, `--scope` | Not yet implemented |
 | [`serve`]({{< relref "serve.md" >}}) | Start the local browser editor, rule-violation viewer and reports viewer | — | Not yet implemented |
 | [`sign`]({{< relref "sign.md" >}}) | Record an electronic signature against an entity or change request | — | Not yet implemented |
 | [`sign verify`]({{< relref "sign-verify.md" >}}) | Check signature records against the content they sign | `--all`, `--commit`, `--json`, `--scope` | Not yet implemented |
