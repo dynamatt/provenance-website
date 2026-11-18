@@ -19,7 +19,7 @@ are part of the planned command surface: in the current build they print
 | [`component add`]({{< relref "component-add.md" >}}) | Register a component repository as a submodule | `--path` | Not yet implemented |
 | [`component remove`]({{< relref "component-remove.md" >}}) | Remove a component submodule | — | Not yet implemented |
 | [`component update`]({{< relref "component-update.md" >}}) | Move a pinned component to a different commit | — | Not yet implemented |
-| [`diff`]({{< relref "diff.md" >}}) | Show a rendered, semantic diff between two git refs | `--entity` | Not yet implemented |
+| [`diff`]({{< relref "diff.md" >}}) | Show what changed in the design history file between two git refs | `--exit-code`, `--output`, `--scope` | Available |
 | [`export`]({{< relref "export.md" >}}) | Export the design history file (website, pdf, docx) | `--out`, `--scope` | In development |
 | [`fmt`]({{< relref "fmt.md" >}}) | Write entity files in canonical form | `--all`, `--check` | Available |
 | [`init`]({{< relref "init.md" >}}) | Start a new project from a starter template | `--code`, `--name`, `--template` | Available |
