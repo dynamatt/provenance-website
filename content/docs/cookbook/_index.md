@@ -17,3 +17,6 @@ you can export it and see the result.
   a kind of document written once, as a type extending Document and a
   template filling a block of Document's, so each report holds only its
   prose and what it covers.
+- [Pull-request summaries]({{< relref "docs/cookbook/pull-request-summaries" >}}):
+  what a pull request changes in the design history file, as a table on
+  the CI run's page, and every page it touches redlined as an artifact.
