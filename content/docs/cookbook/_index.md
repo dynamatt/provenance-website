@@ -20,3 +20,7 @@ you can export it and see the result.
 - [Pull-request summaries]({{< relref "docs/cookbook/pull-request-summaries" >}}):
   what a pull request changes in the design history file, as a table on
   the CI run's page, and every page it touches redlined as an artifact.
+- [Stale evidence]({{< relref "docs/cookbook/stale-evidence" >}}): evidence
+  reported when its protocol changes after it was run, until it is run
+  again or the change is justified, and protocols approved after every
+  change to what they test.
