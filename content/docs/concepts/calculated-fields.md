@@ -83,8 +83,12 @@ spreadsheet, which treats a blank cell as `0`:
 
 ## Aggregates
 
-- `MAX`, `MIN`, `SUM` and `AVG` use the numbers among their arguments and
-  skip everything else.
+- `SUM` and `AVG` use the numbers among their arguments and skip
+  everything else.
+- `MAX` and `MIN` use the numbers, or the dates, among their arguments:
+  `MAX(execution_date, justifications[].date)` is the later of a date and
+  a list's dates. Numbers and dates together have no maximum, so the
+  result is blank.
 - `COUNT` counts every value that is not blank, numbers or not, so
   `COUNT(verified_by)` is the number of verification protocols.
 - With no values, `SUM` and `COUNT` are `0`; `MAX`, `MIN` and `AVG` are
@@ -93,6 +97,25 @@ spreadsheet, which treats a blank cell as `0`:
   both rated 15 add up to 30.
 
 Arguments can be mixed: `MAX(failure_modes[].row_rating, minimum_rating)`.
+
+## What changed when
+
+Every entity's changes in git are readable as two built-in lists: `changes`
+has one row per change, and `last_changed` holds just the newest one (see
+[Rules]({{< relref "docs/concepts/rules" >}}#what-changed-when)). A formula
+reads the newest change's `last_changed.date`, `last_changed.author` or
+`last_changed.commit`, or aggregates every change, as in `MIN(changes[].date)`.
+That is how a template shows them: give the type a field such as
+
+```yaml
+- name: changed_on
+  type: calculated
+  formula: "last_changed.date"
+```
+
+and use `{{ .changed_on }}` in the template. History is read only when a
+formula or query names it, and then needs every commit: see
+[Rules]({{< relref "docs/concepts/rules" >}}#what-changed-when).
 
 ## Using calculated values
 

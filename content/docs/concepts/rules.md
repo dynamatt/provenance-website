@@ -269,6 +269,69 @@ A diagram in a language this version can't render, such as `mermaid`, is
 reported by the built-in `content/unrendered-block` check whatever the
 rules allow, so it is never published as source text.
 
+### What changed when
+
+Every entity also has a `changes` list read from git, one row per change
+to its values, newest first, and `last_changed`, its newest row:
+
+| Field | Value |
+| --- | --- |
+| `date` | The day the change was written, from its commit's author date, in the author's time zone |
+| `author`, `subject` | The commit's author and the first line of its message |
+| `commit` | The commit on the branch being validated; commits compare by history, `greater_than` meaning *later* |
+| `kind` | `added` for the change that added the entity, otherwise `changed` |
+| `fields` | The fields whose values the change set or changed, `body` for the Markdown body |
+
+A change is a change to the entity's values, as
+[`provenance diff`]({{< relref "docs/concepts/reviewing-changes" >}})
+compares them: reformatting a file, or moving it, is no change. Calculated
+and query fields don't count. Their inputs change at their own commits.
+
+Evidence is stale when the protocol it ran has changed since. A
+justification dated after the change clears it, without running the test
+again:
+
+```yaml
+# rules/evidence-current.yaml
+severity: warning
+message: "the protocol it executed has changed since it was run or justified"
+from: VerificationEvidence
+where:
+  field: tests
+  where:
+    field: changes
+    where:
+      - {field: kind, operator: equals, value: changed}
+      - any_of:
+          - {field: fields, operator: equals, value: procedure}
+          - {field: fields, operator: equals, value: steps}
+      - {field: date, operator: greater_than, value_of: ^^current_as_of}
+```
+
+`current_as_of` is a calculated field on the evidence,
+`MAX(execution_date, justifications[].date)`, and `^^` reads it from two
+levels out. The rule decides what clears it, so editing the evidence for
+any other reason doesn't. The
+[stale evidence recipe]({{< relref "docs/cookbook/stale-evidence" >}}) adds
+approvals.
+
+Some things to know:
+
+- **Dates are days.** A change and a justification on the same day count
+  as justified.
+- **A change not yet committed has no date.** A date rule sees it once it
+  is committed.
+- **A merged pull request's changes are dated by the commits that made
+  them**, so a justification written in the pull request comes after the
+  change it justifies. A squash merge leaves one commit, dated when it was
+  merged: merge with a merge commit or rebase where rules compare dates.
+- **Dates are what the author's git wrote**, so a commit can be backdated.
+  Signatures, when they come, make who approved what, and when, verifiable.
+- **Rules reading history need every commit.** In a shallow clone, or
+  outside a git repository, `validate` stops with exit 2. In CI, check out
+  with `fetch-depth: 0`. A project whose rules never name `changes` or
+  `last_changed` runs anywhere.
+
 ## Reports for tools
 
 `--output <name>` writes the same violations for other tools. The exit
@@ -421,6 +484,8 @@ jobs:
       PROVENANCE_SHA256: <sha256>
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # every commit, for rules on what changed when
       - name: Install Provenance
         run: |
           curl -fsSLo provenance "https://github.com/dynamatt/provenance/releases/download/$PROVENANCE_VERSION/provenance-linux-amd64"
